@@ -1,11 +1,11 @@
-yields <- read.csv("./Data/IowaAnalysis2.csv", stringsAsFactors=F)
+yield <- read.csv("./Data/IowaAnalysis2.csv", stringsAsFactors=F)
 
 library(ggplot2)
 library(reshape2)
 library(dplyr)
 library(lubridate)
 library(stringr)
-tmp <- subset(yields, Location=="Ames")
+tmp <- subset(yield, Location=="Ames")
 tmp$id <- 1:nrow(tmp)
 tmp2 <- melt(tmp, id.vars=c(1,2,3,5,17:19), measure.vars=c(4,6:10), variable.name="Stage", value.name="Date")
 tmp2$Date <- paste0(tmp2$Date, "-2000")
@@ -27,9 +27,9 @@ ggplot(data=subset(tmp2, !is.na(Date))) +
   facet_grid(MG~., labeller=label_both) + theme_bw() + theme(panel.grid.major.x=element_line(color="grey30")) + 
   ggtitle("Development by Maturity Group") + xlab("Time") 
 
-yields$Planting2 <- paste0(yields$Planting, "-2000")
-yields$Planting2 <- yday(dmy(yields$Planting2))-92
-ggplot(data=yields, aes(x=MG, y=Yield, group=interaction(Location, Planting2))) + 
+yield$Planting2 <- paste0(yield$Planting, "-2000")
+yield$Planting2 <- yday(dmy(yield$Planting2))-92
+ggplot(data=yield, aes(x=MG, y=Yield, group=interaction(Location, Planting2))) + 
   geom_jitter(alpha=.1) + 
   geom_smooth(aes(colour=Planting2), method="loess", se=F) + 
   scale_colour_gradient2("Planting Date: \nDays After April 1", low="steelblue3", mid="springgreen4", midpoint=62, high="yellow") +
@@ -37,9 +37,9 @@ ggplot(data=yields, aes(x=MG, y=Yield, group=interaction(Location, Planting2))) 
   theme_bw() + ggtitle("Yield by Maturity Group and Planting Date")
 
 
-yields$Planting2 <- paste0(yields$Planting, "-2000")
-yields$Planting2 <- dmy(yields$Planting2)
-ggplot(data=yields, aes(x=Planting2, y=Yield, group=Location)) + 
+yield$Planting2 <- paste0(yield$Planting, "-2000")
+yield$Planting2 <- dmy(yield$Planting2)
+ggplot(data=yield, aes(x=Planting2, y=Yield, group=Location)) + 
   geom_jitter(alpha=.1) + 
   geom_smooth(aes(colour=Location), method="loess", se=F) + 
   facet_wrap(~MG) + 
