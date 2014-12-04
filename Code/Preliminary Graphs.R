@@ -18,13 +18,35 @@ summary.tmp <- tmp2 %>% group_by(Stage, MG) %>% summarize(q25=quantile(Date, .25
                                                           q50=quantile(Date, .5, na.rm=T), 
                                                           q75=quantile(Date, .75, na.rm=T))
 
-qplot(data=summary.tmp, x=Stage, y=q50, ymin=q25, ymax=q75, geom="crossbar") + 
-  facet_grid(MG~., labeller=label_both) + coord_flip() + ggtitle("Development by Maturity Group") + xlab("Time") 
+qplot(data=subset(summary.tmp, MG==0), x=Stage, y=q50, ymin=q25, ymax=q75, geom="crossbar") + 
+#   facet_grid(MG~., labeller=label_both) + 
+  coord_flip() + ggtitle("Development by Maturity Group") + xlab("Time") 
 
-ggplot(data=subset(tmp2, !is.na(Date))) + 
+ggplot(data=subset(tmp2, MG==5 & !is.na(Date))) + 
   stat_density(aes(x=Date, y=Stage, alpha=..scaled..), fill="darkgreen", geom="tile", position="identity") + 
-  scale_alpha_identity() + 
-  facet_grid(MG~., labeller=label_both) + theme_bw() + theme(panel.grid.major.x=element_line(color="grey30")) + 
+  scale_alpha_identity() +  
+  geom_segment(aes(x=q25, xend=q75, 
+                   y=as.numeric(Stage)-.25, 
+                   yend=as.numeric(Stage)-.25), 
+               data=subset(summary.tmp, MG==5)) +
+  geom_segment(aes(x=q25, xend=q75, 
+                   y=as.numeric(Stage)+.25, 
+                   yend=as.numeric(Stage)+.25), 
+               data=subset(summary.tmp, MG==5)) +
+  geom_segment(aes(x=q75, xend=q75, 
+                   y=as.numeric(Stage)-.25, 
+                   yend=as.numeric(Stage)+.25), 
+               data=subset(summary.tmp, MG==5)) +
+  geom_segment(aes(x=q50, xend=q50, 
+                   y=as.numeric(Stage)-.25, 
+                   yend=as.numeric(Stage)+.25), 
+               data=subset(summary.tmp, MG==5)) +
+  geom_segment(aes(x=q25, xend=q25, 
+                   y=as.numeric(Stage)-.25, 
+                   yend=as.numeric(Stage)+.25), 
+               data=subset(summary.tmp, MG==5)) +
+#   facet_grid(MG~., labeller=label_both) + 
+  theme_bw() + theme(panel.grid.major.x=element_line(color="grey30")) + 
   ggtitle("Development by Maturity Group") + xlab("Time") 
 
 yield$Planting2 <- paste0(yield$Planting, "-2000")
@@ -39,8 +61,26 @@ ggplot(data=yield, aes(x=MG, y=Yield, group=interaction(Location, Planting2))) +
 
 yield$Planting2 <- paste0(yield$Planting, "-2000")
 yield$Planting2 <- dmy(yield$Planting2)
-ggplot(data=yield, aes(x=Planting2, y=Yield, group=Location)) + 
-  geom_jitter(alpha=.1) + 
-  geom_smooth(aes(colour=Location), method="loess", se=F) + 
-  facet_wrap(~MG) + 
+ggplot(data=subset(yield, Location=="Ames" & MG==2 & Yield>0), aes(x=Planting2, y=Yield, group=Location)) + 
+  geom_jitter(alpha=.4) + 
+  geom_smooth(aes(colour=Location), method="loess") + 
+#   facet_wrap(~MG) + 
   theme_bw() + ggtitle("Yield by Planting Date and Maturity Group")
+
+
+
+library(splines)
+bx5 <- cbind(I=1, ns(plotdata$jitterDate, df=5)) 
+cubicspline5 <- lm(data=plotdata, nyield~bx5-1)
+
+
+spline.data <- data.frame(jitterDate=plotdata$jitterDate)
+bx5.pred <- data.frame(I=1, ns(spline.data$jitterDate, df=5))
+spline.data <- cbind(spline.data, predict(cubicspline5, newdata=bx5.pred, se.fit=T, interval="prediction"))
+
+ggplot() + 
+  geom_jitter(data=plotdata, aes(x=jitterDate, y=nyield), alpha=.5) + 
+  geom_ribbon(data=spline.data, aes(x=jitterDate, ymin=fit.lwr, ymax=fit.upr), alpha=.25) + 
+  geom_line(data=spline.data, aes(x=jitterDate, y=fit.fit)) + 
+  facet_wrap(~Location) + 
+  theme_bw() + ggtitle(paste0("Normalized Yield by Planting Date (Maturity Group ", input$maturity2b, ")"))
