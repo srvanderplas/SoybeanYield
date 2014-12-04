@@ -13,13 +13,19 @@ tmp2$Date <- dmy(tmp2$Date)
 tmp2$Date.of.first.frost <- paste0(tmp2$Date.of.first.frost, "-2000")
 tmp2$Date.of.first.frost <- dmy(tmp2$Date.of.first.frost)
 tmp2$Stage <- factor(tmp2$Stage, levels=c("Planting", "VE", "R1", "R4", "R7", "R8"))
-qplot(data=tmp2, x=Stage, y=Date, geom="boxplot") + 
-  facet_grid(~MG, labeller=label_both) + coord_flip()
+
+summary.tmp <- tmp2 %>% group_by(Stage, MG) %>% summarize(q25=quantile(Date, .25, na.rm=T), 
+                                                          q50=quantile(Date, .5, na.rm=T), 
+                                                          q75=quantile(Date, .75, na.rm=T))
+
+qplot(data=summary.tmp, x=Stage, y=q50, ymin=q25, ymax=q75, geom="crossbar") + 
+  facet_grid(MG~., labeller=label_both) + coord_flip() + ggtitle("Development by Maturity Group") + xlab("Time") 
 
 ggplot(data=subset(tmp2, !is.na(Date))) + 
   stat_density(aes(x=Date, y=Stage, alpha=..scaled..), fill="darkgreen", geom="tile", position="identity") + 
   scale_alpha_identity() + 
-  facet_grid(MG~., labeller=label_both) + theme_bw() + theme(panel.grid.major.x=element_line(color="grey30"))
+  facet_grid(MG~., labeller=label_both) + theme_bw() + theme(panel.grid.major.x=element_line(color="grey30")) + 
+  ggtitle("Development by Maturity Group") + xlab("Time") 
 
 yields$Planting2 <- paste0(yields$Planting, "-2000")
 yields$Planting2 <- yday(dmy(yields$Planting2))-92
