@@ -146,6 +146,7 @@ shinyServer(function(input, output, session) {
 
     plots <- list(plot, plot1, plot2)
     print(plots[[as.numeric(input$plottype)]])
+  }, res=90)
 
   
   output$YieldByMGPlot <- renderPlot({
@@ -199,7 +200,7 @@ shinyServer(function(input, output, session) {
         ggtitle(paste0("Relative Yield by Maturity Group"))
     
     print(plot)
-  })
+  }, res=90)
   
   output$YieldByPlantingPlot <- renderPlot({
     plotdata <- filter(yield, 
@@ -253,5 +254,5 @@ shinyServer(function(input, output, session) {
         ggtitle(paste0("Relative Yield by Planting Date"))
     
     print(plot)
-  })
+  }, res=90)
 })
