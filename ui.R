@@ -31,22 +31,21 @@ shinyUI(fluidPage(
                    checkboxInput("failed", label="Include failed trials?")))
     )),
   fluidRow(
+    plotOutput("DevelopmentPlot", height=350),
+    div(align="center", 
+        helpText("This plot shows the temporal distribution of each maturity stage by maturity group and planting date. 
+                 The boxes shown indicate the 25th, and 75th percentiles, with an additional line indicating the median."))),
+  fluidRow(
     column(6,
-           # Output - side 1
-           plotOutput("DevelopmentPlot", height=500),
-           div(align="center", 
-               helpText("This plot shows the temporal distribution of each maturity stage by maturity group and planting date. 
-                           The boxes shown indicate the 25th, and 75th percentiles, with an additional line indicating the median."))
-    ),
+           plotOutput("YieldByMGPlot", height=300),
+           div(align="center", helpText("This plot shows the decline in (relative) yield with increasing maturity group, for a specified planting date."))
+           ),
     column(6,
-           # Output - side 2a
-           plotOutput("YieldByMGPlot", height=250),
-           div(align="center", helpText("This plot shows the decline in (normalized) yield with increasing maturity group, for a specified planting date.")),
            # Output - side 2b
-           plotOutput("YieldByPlantingPlot", height=250), 
-           div(align="center", helpText("This plot shows the decline in (normalized) yield with later planting dates, for a specified maturity group."))
-    )
-  )
+           plotOutput("YieldByPlantingPlot", height=300), 
+           div(align="center", helpText("This plot shows the decline in (relative) yield with later planting dates, for a specified maturity group."))
+           )
+    ),
     wellPanel(
       fluidRow(
         column(2, offset=1, h4("Testing Plot Options")),
