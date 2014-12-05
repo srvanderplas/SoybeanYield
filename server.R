@@ -10,41 +10,69 @@ load("Data/serverStart.rda")
 
 shinyServer(function(input, output, session) {
   
+  observe({
+    if(input$compare=="Location"){
+      updateSelectizeInput(session, "location", options=list(maxItems=3))
+    } else {
+      updateSelectizeInput(session, "location", 
+                           selected=input$location[1], 
+                           options=list(maxItems=1))
+    }  
+    
+    if(input$compare=="PlantDay"){
+      updateSelectizeInput(session, "planting", options=list(maxItems=3))
+    } else {
+      updateSelectizeInput(session, "planting", 
+                           selected=input$planting[1], 
+                           options=list(maxItems=1))
+    }  
+    
+    if(input$compare=="MG"){
+      updateSelectizeInput(session, "maturity", options=list(maxItems=3))
+    } else {
+      updateSelectizeInput(session, "maturity", 
+                           selected=input$maturity[1], 
+                           options=list(maxItems=1))
+    }  
+    
+  })
+  
   # Plot of development progress
   output$DevelopmentPlot <- renderPlot({
     
     longdata.sub <- filter(longyield, MG==input$maturity & 
                              Location == input$location & 
-                             PlantDay%in%input$planting)
+                             PlantDay%in%input$planting) 
+    longdata.sub$facet <- longdata.sub[,input$compare]
     
     plant.dates <- ydm(paste0("2000-", input$planting))
-    second(longdata.sub$Date) <- (longdata.sub$Date%in%plant.dates)*sample(1:60, nrow(longdata.sub), replace=T)
-    
-    plot <- ggplot() + 
-      stat_density(aes(x=Date, y=Stage, alpha=..scaled..), 
-                   data=longdata.sub, fill="green4", geom="tile", position="identity") + 
-      scale_alpha_continuous(range=c(0,.9), guide="none") 
+    second(longdata.sub$Date) <- (longdata.sub$Date%in%plant.dates)*sample(1:2, nrow(longdata.sub), replace=T)
     
     if(length(input$planting)<2){
-
-      plant.dates.df <- data.frame(x=plant.dates, y=.5, yend=1.5)
-      
-      plot <- plot + 
-        geom_segment(aes(x=x, xend=x, y=y, yend=yend), data=plant.dates.df, colour="darkgreen")
+      plant.dates.df <- data.frame(x=plant.dates, y=.5, yend=1.5, facet=unique(longdata.sub$facet))
+    } else {
+      plant.dates.df <- data.frame(x=plant.dates, y=.5, yend=1.5, facet=unique(input$planting))
     }
     
     quantile.sub <- longdata.sub %>% 
-      group_by(Location, PlantDay, MG, Stage) %>% 
+      group_by(Location, PlantDay, MG, Stage, facet) %>% 
       summarize(q25=quantile(Date, .25),
                 q50=quantile(Date, .5), 
-                q75=quantile(Date, .75)) %>%
-      filter(Stage != "Planting")
+                q75=quantile(Date, .75))
     
-    frost.date.df <- data.frame(frost.date = 
-                                  mean(filter(yield, Location == input$location & 
+    frost.date.df <- data.frame(frost.date.lb = 
+                                  quantile(filter(yield, Location == input$location & 
                                                 PlantDay %in% input$planting & 
-                                                MG==input$maturity)$Date.of.first.frost2), 
-                                y=.5, label="Avg. Frost Date")
+                                                MG==input$maturity)$Date.of.first.frost2, .25), 
+                                frost.date.ub = 
+                                  quantile(filter(yield, Location == input$location & 
+                                                    PlantDay %in% input$planting & 
+                                                    MG==input$maturity)$Date.of.first.frost2, .75),
+                                frost.date = 
+                                  quantile(filter(yield, Location == input$location & 
+                                                    PlantDay %in% input$planting & 
+                                                    MG==input$maturity)$Date.of.first.frost2, .5), 
+                                y=.5, label="First Frost Likely")
     
     plot <- plot +
       geom_segment(aes(x=q25, xend=q75, 
