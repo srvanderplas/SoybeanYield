@@ -3,14 +3,15 @@ load("Data/uiStart.rda")
 
 # Define UI for application that plots random distributions
 shinyUI(fluidPage(
-  theme="http://bootswatch.com/simplex/bootstrap.min.css",
+  theme="http://bootswatch.com/simplex/bootstrap.css",
   tags$style(type="text/css",
-             "label {font-size: 12px;}",
-             ".recalculating {opacity: 1.0;}"
+             "label {font-size: 14px;}"
   ),
+#   tags$head(tags$style(type="text/css", "label.radio { display: inline; width: 25%; margin-right:2%;}")), # format checkbox inputs in 3 columns with some padding.
   
   # Application title
   titlePanel("Soybean Yield"),
+  
   wellPanel(
     fluidRow(
       column(3,div(align="center", 
