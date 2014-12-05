@@ -164,13 +164,14 @@ shinyServer(function(input, output, session) {
     
     plotdata <- plotdata %>% group_by(facet) %>% mutate(nyield=Yield/max(Yield))
     plotdata$jitterMG <- jitter(plotdata$MG)
-    bx3 <- cbind(I=1, ns(plotdata$jitterMG, df=3)) 
-    cubicspline3 <- lm(data=plotdata, nyield~bx3-1)
-    spline.data <- data.frame(jitterMG=plotdata$jitterMG)
-    spline.data <- cbind(spline.data, predict(cubicspline3, se.fit=T, interval="prediction"))
-    spline.data$fit.lwr <- pmax(spline.data$fit.lwr, 0)
-    spline.data$fit.upr <- pmin(spline.data$fit.upr, 1)
     
+    spline.data <- plotdata %>% group_by(facet) %>% do({
+      bx3 <- cbind(I=1, ns(.$jitterMG, df=3)) 
+      cubicspline3 <- lm(data=., nyield~bx3-1)
+      tmp <- data.frame(jitterMG=.$jitterMG)
+      tmp <- cbind(tmp, suppressWarnings(predict(cubicspline3, se.fit=T, interval=input$intervaltype, level=as.numeric(input$pvalue))))
+      tmp
+    })
     
     if(input$points){
       plot <- ggplot() + 
@@ -217,12 +218,14 @@ shinyServer(function(input, output, session) {
     plotdata$nyield <- plotdata$Yield/max(plotdata$Yield)
     plotdata$jitterDate <- yday(plotdata$Planting2)
     
-    bx5 <- cbind(I=1, ns(plotdata$jitterDate, df=5)) 
-    cubicspline5 <- lm(data=plotdata, nyield~bx5-1)
-    spline.data <- data.frame(jitterDate=plotdata$jitterDate)
-    spline.data <- cbind(spline.data, predict(cubicspline5, se.fit=T, interval="prediction"))
-    spline.data$fit.lwr <- pmax(spline.data$fit.lwr, 0)
-    spline.data$fit.upr <- pmin(spline.data$fit.upr, 1)
+    spline.data <- plotdata %>% group_by(facet) %>% do({
+      bx5 <- cbind(I=1, ns(.$jitterDate, df=5)) 
+      cubicspline5 <- lm(data=., nyield~bx5-1)
+      tmp <- data.frame(jitterDate=.$jitterDate)
+      tmp <- cbind(tmp, suppressWarnings(predict(cubicspline5, se.fit=T, interval=input$intervaltype, level=as.numeric(input$pvalue))))
+      tmp
+    })
+    
     if(input$points){
       plot <- ggplot() + 
         geom_jitter(data=plotdata, aes(x=jitterDate, y=nyield), alpha=.25) 
