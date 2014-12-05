@@ -44,4 +44,14 @@ shinyUI(fluidPage(
            div(align="center", helpText("This plot shows the decline in (normalized) yield with later planting dates, for a specified maturity group."))
     )
   )
+    wellPanel(
+      fluidRow(
+        column(2, offset=1, h4("Testing Plot Options")),
+        column(2,radioButtons("plottype", label="Phenology Plot type", 
+                              choices=c("Box Plot" = 3, "Violin Plot" = 2, "Tile Density Plot (old style)" = 1))), 
+        column(1,checkboxInput("facets", label="Show facets in Phenology Plot")),
+        column(2,radioButtons("intervaltype", label="Interval type", choices=c("confidence", "prediction"), selected="prediction")),
+        column(1,radioButtons("pvalue", label="Conf. Level", choices=c("90%"=.95, "95%"=.975, "99%"=.995), selected=.975)),
+        column(1,checkboxInput("points", label="Show Points"))
+      ))
 ))
