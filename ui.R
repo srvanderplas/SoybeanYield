@@ -14,18 +14,20 @@ shinyUI(fluidPage(
   
   wellPanel(
     fluidRow(
-      column(3,div(align="center", 
+      column(2, offset=1, radioButtons("compare", label="Comparison Variable", 
+                                       choices=c("Location"="Location", "Planting Date"="PlantDay", "Maturity Group"="MG"))),
+      column(2,div(align="center", 
                    selectizeInput("location", label="Select location(s)", 
                                   choices=locations, selected="Ames", 
                                   multiple=TRUE, options=list(maxItems=3)))),
-      column(3,div(align="center", 
+      column(2,div(align="center", 
                    selectizeInput("planting", label="Select planting date", 
                                   choices=planting.date, selected="5-Jun", 
-                                  multiple=TRUE, options=list(maxItems=1)))),
-      column(3,div(align="center", 
+                                  multiple=TRUE, options=list(maxItems=3)))),
+      column(2,div(align="center", 
                    selectizeInput("maturity", label="Select maturity group", 
-                                  choices=0:5, selected=0, multiple=FALSE))),
-      column(3,div(align="center", 
+                                  choices=0:5, selected=0, multiple=TRUE, options=list(maxItems=3)))),
+      column(2,div(align="center", 
                    checkboxInput("failed", label="Include failed trials?")))
     )),
   fluidRow(
