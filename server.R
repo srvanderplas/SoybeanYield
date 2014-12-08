@@ -134,7 +134,7 @@ shinyServer(function(input, output, session) {
       }
     }
     print(plot)
-  }, res=90)
+  })
 
   
   output$YieldByMGPlot <- renderPlot({
@@ -185,10 +185,14 @@ shinyServer(function(input, output, session) {
         scale_y_continuous(breaks=c(0, .25, .5, .75, 1), name="Relative Yield", limits=c(0, 1.05)) + 
         scale_x_continuous(breaks=0:5, labels=0:5, name="Maturity Group") + 
         theme_bw() + 
+        theme(plot.title=element_text(size=18), 
+              axis.text = element_text(size = 16), 
+              legend.title=element_text(size=16), 
+              legend.text=element_text(size=14)) + 
         ggtitle(paste0("Relative Yield by Maturity Group"))
     
     print(plot)
-  }, res=90)
+  })
   
   output$YieldByPlantingPlot <- renderPlot({
     plotdata <- filter(yield, 
@@ -239,8 +243,12 @@ shinyServer(function(input, output, session) {
         scale_x_continuous("", breaks=c(92, 122, 153, 183, 214, 245), 
                            labels=c("Apr", "May", "Jun", "Jul", "Aug", "Sept")) + 
         theme_bw() + 
+        theme(plot.title=element_text(size=18), 
+          axis.text = element_text(size = 16), 
+          legend.title=element_text(size=16), 
+          legend.text=element_text(size=14)) + 
         ggtitle(paste0("Relative Yield by Planting Date"))
     
     print(plot)
-  }, res=90)
+  })
 })
