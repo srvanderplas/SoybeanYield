@@ -104,6 +104,10 @@ shinyServer(function(input, output, session) {
                                                                   Location%in%input$location & 
                                                                   PlantDay%in%input$planting)$Date.of.first.frost2, 
                                                          .75, na.rm=T), "day")
+      frost.date.df$med.frost <- floor_date(quantile(filter(yield, MG%in%input$maturity & 
+                                                              Location%in%input$location & 
+                                                              PlantDay%in%input$planting)$Date.of.first.frost2, 
+                                                     .5, na.rm=T), "day")
       frost.date.df$textlabel <- floor_date(median(frost.date.df$frost.date), "day")
       frost.date.df$facet <- frost.date.df[,input$compare]
       
@@ -115,7 +119,6 @@ shinyServer(function(input, output, session) {
         scale_color_brewer(gsub("PlantDay", "Planting\nDate", input$compare), palette="Set1") + 
         scale_fill_brewer(gsub("PlantDay", "Planting\nDate", input$compare), palette="Set1") + 
         geom_rect(aes(ymin=frost.date.lb, ymax=frost.date.ub, xmin=-Inf, xmax=Inf), alpha=.05, fill="black", data=frost.date.df) +  
-        geom_segment(aes(y=frost.date, yend=frost.date, x=y+.25, xend=Inf, color=factor(facet)), data=frost.date.df, linetype=2) + 
         geom_text(aes(y=textlabel, x=y, label=label), data=frost.date.df, hjust=1, vjust=0, size=6) + 
         xlab("") + ylab("") + 
         geom_vline(aes(xintercept=seq(.5, 5.5, 1)), colour="grey30") +
@@ -127,11 +130,17 @@ shinyServer(function(input, output, session) {
               panel.grid.major.x=element_line(color="grey40"), 
               panel.grid.minor.y=element_line(color="black"))
       
+      
       if(input$compare=="Location") {
-        plot <- plot + ggtitle(paste0("Development Timeline if Planted on ", input$planting, 
+        plot <- plot + 
+          geom_segment(aes(y=frost.date, yend=frost.date, x=y+.25, xend=Inf, 
+                           color=factor(facet)), data=frost.date.df, linetype=2) + 
+          ggtitle(paste0("Development Timeline if Planted on ", input$planting, 
                                       " (MG=", input$maturity, ")"))
       } else if(input$compare=="MG"){
-        plot <- plot + ggtitle(paste0("Development Timeline if Planted on ", input$planting, ")"))
+        plot <- plot + 
+          geom_segment(aes(y=med.frost, yend=med.frost, x=y+.25, xend=Inf), data=frost.date.df[1,], linetype=2) + 
+          ggtitle(paste0("Development Timeline if Planted on ", input$planting, ")"))
       } else {
         plot <- plot + ggtitle(paste0("Development Timeline if Planted on ", input$planting, ")"))
       }
