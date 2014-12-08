@@ -143,21 +143,8 @@ shinyServer(function(input, output, session) {
               legend.title=element_text(size=16), 
               legend.text=element_text(size=14),
               panel.grid.major.x=element_line(color="grey40"), 
-              panel.grid.minor.y=element_line(color="black"))
-
-      if(input$compare=="Location") {
-        plot <- plot + 
-          geom_segment(aes(y=frost.date, yend=frost.date, x=y+.25, xend=Inf, 
-                           color=factor(facet)), data=frost.date.df, linetype=2) + 
-          ggtitle(paste0("Development Timeline if Planted on ", input$planting, 
-                                      " (MG=", input$maturity, ")"))
-      } else if(input$compare=="MG"){
-        plot <- plot + 
-          geom_segment(aes(y=med.frost, yend=med.frost, x=y+.25, xend=Inf), data=frost.date.df[1,], linetype=2) + 
-          ggtitle(paste0("Development Timeline if Planted on ", input$planting))
-      } else {
-        plot <- plot + ggtitle(paste0("Development Timeline for MG ", input$maturity, " in ", input$location))
-      }
+              panel.grid.minor.y=element_line(color="black")) +  
+        ggtitle("Development Timeline of Soybeans")
     }
     print(plot)
   })
