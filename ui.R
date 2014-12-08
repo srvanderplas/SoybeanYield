@@ -37,11 +37,20 @@ shinyUI(fluidPage(
     )),
   fluidRow(
     column(10, 
-    plotOutput("DevelopmentPlot", height=400),
-    div(align="center", 
-        helpText("This plot shows the temporal distribution of each maturity stage by maturity group and planting date. 
-                 The boxes shown indicate the 25th, and 75th percentiles, with an additional line indicating the median."))),
-    column(2, br(), br(), wellPanel(radioButtons("plottype", "Phenology Plot Type", choices=c("Box Plot" = 1, "Violin Plot" = 2), selected=1), br(), checkboxInput("facets", "Show Facets in Phenology Plot", value=FALSE)))),
+      plotOutput("DevelopmentPlot", height=400),
+      div(align="center", 
+          helpText("This plot shows the temporal distribution of each maturity stage by maturity group and planting date. 
+                    The boxes shown indicate the 25th, and 75th percentiles, with an additional line indicating the median.")
+          )
+      ),
+    column(2, br(), br(), 
+           wellPanel(
+             h4("Phenology Plot Options"),
+             radioButtons("plottype", "Plot Type", choices=c("Box Plot" = 1, "Violin Plot" = 2), selected=1), 
+             br(), 
+             checkboxInput("facets", "Show Facets", value=FALSE))
+           )
+    ),
   fluidRow(
     column(4, offset=1, 
            plotOutput("YieldByMGPlot", height=300)), 
