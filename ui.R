@@ -36,7 +36,7 @@ shinyUI(fluidPage(
       column(2, offset=1, checkboxInput("points", label="Show Points"))
     )),
   fluidRow(
-    plotOutput("DevelopmentPlot", height=350),
+    plotOutput("DevelopmentPlot", height=400),
     div(align="center", 
         helpText("This plot shows the temporal distribution of each maturity stage by maturity group and planting date. 
                  The boxes shown indicate the 25th, and 75th percentiles, with an additional line indicating the median."))),
