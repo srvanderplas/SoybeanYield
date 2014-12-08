@@ -14,14 +14,15 @@ shinyUI(fluidPage(
   
   wellPanel(
     fluidRow(
-      column(3, p("Select a variable to compare up to 3 different values for that variable. You may only select one variable at a time to compare in this way.")),
-      column(6, p("Click on the boxes below to see what options are available. You can type or select options to add them, and use the backspace key to remove a selected option. You may select up to three values for the variable chosen as the comparison variable, and one value for the other two variables.")), 
-      column(3, p("Check this box to show the data for the relative yield plots."))
-      ),br(),
+      column(4, offset=1, p("Select a variable to compare up to 3 different values for that variable. You may only select one variable at a time to compare in this way.")),
+      column(3, offset=2, radioButtons("compare", label="Comparison Variable", 
+                             choices=c("Location"="Location", "Planting Date"="PlantDay", "Maturity Group"="MG"), 
+                             inline=TRUE))
+    ), br(),
     fluidRow(
-      column(3, 
-             radioButtons("compare", label="Comparison Variable", 
-                          choices=c("Location"="Location", "Planting Date"="PlantDay", "Maturity Group"="MG"), inline=TRUE)),
+      column(4, offset=1, p("Click on the boxes below to see what options are available."),
+                p("You can type or select options to add them (use backspace to remove a selected option)."),
+                p("You may select up to three values for the variable chosen as the comparison variable.")),
       column(2,div(align="center", 
                    selectizeInput("location", label="Select location(s)", 
                                   choices=locations, selected="Ames", 
@@ -32,8 +33,7 @@ shinyUI(fluidPage(
                                   multiple=TRUE, options=list(maxItems=3)))),
       column(2,div(align="center", 
                    selectizeInput("maturity", label="Select maturity group(s)", 
-                                  choices=0:5, selected=2, multiple=TRUE, options=list(maxItems=3)))), 
-      column(2, offset=1, checkboxInput("points", label="Show Points"))
+                                  choices=0:5, selected=2, multiple=TRUE, options=list(maxItems=3))))
     )),
   fluidRow(
     plotOutput("DevelopmentPlot", height=400),
@@ -56,10 +56,10 @@ shinyUI(fluidPage(
     ),
     wellPanel(
       fluidRow(
-        column(2, offset=1, h4("Testing Plot Options")),
-        column(1,radioButtons("intervaltype", label="Interval type", choices=c("confidence", "prediction"), selected="prediction")),
-        column(2, helpText("Confidence intervals show the variability around the average value, prediction intervals show the variability around a single predicted value.")),
-        column(1,radioButtons("pvalue", label="Conf. Level", choices=c("90%"=.95, "95%"=.975, "99%"=.995), selected=.975)),
-        column(2, helpText("The confidence level is a measure of the accuracy of the interval. If we have 95% confidence, then we expect that of 100 intervals we construct, 95 will contain the true mean or predicted value."))
+        column(2, offset=1, h4("Plot Options")),
+        column(2, radioButtons("plottype", "Phenology Plot Type", choices=c("Box Plot" = 1, "Violin Plot" = 2), selected=1)),
+        column(1, checkboxInput("facets", "Show Facets in Phenology Plot", value=FALSE)), 
+        column(1, offset=1, checkboxInput("points", label="Show Points")),
+        column(2, checkboxInput("failed", label="Include Failed Trials?"))
       ))
 ))
