@@ -73,23 +73,8 @@ shinyServer(function(input, output, session) {
                                                     PlantDay %in% input$planting & 
                                                     MG==input$maturity)$Date.of.first.frost2, .5), 
                                 y=.5, label="First Frost Likely")
-    plot1 <- ggplot() + 
-      geom_violin(aes(x=Stage, y=Date, fill=factor(facet), color=factor(facet)), 
-                  alpha=.3, data=longdata.sub, scale="width", adjust=2) +
-      scale_color_brewer(gsub("PlantDay", "Planting\nDate", input$compare), palette="Set1") + coord_flip() + 
-      scale_fill_brewer(gsub("PlantDay", "Planting\nDate", input$compare), palette="Set1") + coord_flip() + 
-      geom_rect(aes(ymin=frost.date.lb, ymax=frost.date.ub, xmin=-Inf, xmax=Inf), alpha=.1, fill="black", data=frost.date.df) +  
-      geom_segment(aes(y=frost.date, yend=frost.date, x=y+.25, xend=Inf), data=frost.date.df, linetype=2) + 
-      geom_text(aes(y=frost.date, x=y, label=label), data=frost.date.df, hjust=1, vjust=0) + 
-      xlab("") + ylab("") + 
-      theme_bw() + theme(panel.grid.major.x=element_line(color="grey40")) + 
-      ggtitle(paste0("Development Timeline if Planted on ", input$planting, 
-                     " (MG=", input$maturity, ")"))
-    if(input$facets){
-      plot1 <- plot1 + facet_wrap(~facet)
-    }
 
-    plot2 <- ggplot() + 
+    plot <- ggplot() + 
       geom_crossbar(aes(x=Stage, y=q50, ymin=q25, ymax=q75, fill=factor(facet), color=factor(facet)), 
                     alpha=.3, position="dodge", data=quantile.sub) +
       coord_flip() + 
@@ -104,50 +89,7 @@ shinyServer(function(input, output, session) {
       theme(panel.grid.major.x=element_line(color="grey40"), panel.grid.minor.y=element_line(color="black")) + 
       ggtitle(paste0("Development Timeline if Planted on ", input$planting, 
                      " (MG=", input$maturity, ")"))
-    if(input$facets){
-      plot2 <- plot2 + facet_grid(Stage~.)
-    }
-    
-    quantile.sub <-  quantile.sub %>% filter(Stage != "Planting")
-    plot <- ggplot() + 
-      stat_density(aes(x=Date, y=Stage, alpha=..scaled..), 
-                   data=longdata.sub, geom="tile", fill="green4", position="identity") + 
-      scale_alpha_continuous(range=c(0,.9), guide="none") + 
-      geom_segment(aes(x=x, xend=x, y=y, yend=yend), data=plant.dates.df, colour="darkgreen") + 
-      geom_segment(aes(x=q25, xend=q75, 
-                       y=as.numeric(Stage)-.25, 
-                       yend=as.numeric(Stage)-.25), 
-                   data=quantile.sub) +
-      geom_segment(aes(x=q25, xend=q75, 
-                       y=as.numeric(Stage)+.25, 
-                       yend=as.numeric(Stage)+.25), 
-                   data=quantile.sub) +
-      geom_segment(aes(x=q75, xend=q75, 
-                       y=as.numeric(Stage)-.25, 
-                       yend=as.numeric(Stage)+.25), 
-                   data=quantile.sub) +
-      geom_segment(aes(x=q50, xend=q50, 
-                       y=as.numeric(Stage)-.25, 
-                       yend=as.numeric(Stage)+.25), 
-                   data=quantile.sub) +
-      geom_segment(aes(x=q25, xend=q25, 
-                       y=as.numeric(Stage)-.25, 
-                       yend=as.numeric(Stage)+.25), 
-                   data=quantile.sub) + 
-      geom_rect(aes(xmin=frost.date.lb, xmax=frost.date.ub, ymin=-Inf, ymax=Inf), alpha=.1, fill="black", data=frost.date.df) +  
-      geom_segment(aes(x=frost.date, xend=frost.date, y=y+.25, yend=Inf), data=frost.date.df, linetype=2) + 
-      geom_text(aes(x=frost.date, y=y, label=label), data=frost.date.df, hjust=.5, vjust=0) + 
-      xlab("") + ylab("") + 
-      #       scale_x_datetime(limits=ymd("2000-04-01", "2000-10-15"))+
-      theme_bw() + theme(panel.grid.major.x=element_line(color="grey40")) + 
-      ggtitle(paste0("Development Timeline if Planted on ", input$planting, 
-                     " (MG=", input$maturity, ")")) + 
-      facet_grid(facet~.)
-    
-    
-
-    plots <- list(plot, plot1, plot2)
-    print(plots[[as.numeric(input$plottype)]])
+    print(plot)
   }, res=90)
 
   
