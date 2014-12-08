@@ -18,11 +18,11 @@ longyield$Date <- dmy(longyield$Date)
 longyield$Stage <- factor(longyield$Stage, 
                           levels=c("Planting", "VE", "R1", "R4", "R7", "R8"), 
                           labels=c("Planting", "Emergence", "Flowering", 
-                                   "Start Grain\nFilling", "Beginning\nMaturity", "R8"))
+                                   "Start Grain\nFilling", "Maturity", "R8"))
 # Leave out R8 for now
 longyield <- filter(longyield, Stage!="R8")
 # Remove NAs
-longyield <- filter(longyield, !is.na(Date))
+# longyield <- filter(longyield, !is.na(Date))
 
 save(yield, longyield, file="Data/serverStart.rda")
 

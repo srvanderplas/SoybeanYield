@@ -8,6 +8,19 @@ library(splines)
 
 load("Data/serverStart.rda")
 
+fix.na.data <- function(df){
+  ret <- unique(df[,c("Location", "PlantDay", "MG", "Stage")])
+  if(sum(!is.na(df$Date))>0){
+    " " 
+  } else {
+    ret$text <- "Not Achieved"
+  }
+  return(ret)
+}
+
+# enlarge font for session 
+theme_set(theme_bw(24))
+
 shinyServer(function(input, output, session) {
   
   observe({
@@ -45,6 +58,11 @@ shinyServer(function(input, output, session) {
                              PlantDay%in%input$planting) 
     longdata.sub$facet <- longdata.sub[,input$compare]
     
+    textdata <- longdata.sub%>%group_by(Location, PlantDay, MG, Stage) %>% do(fix.na.data(.))
+    textdata <- merge(textdata, longdata.sub%>%group_by(Stage)%>%summarize(y=mean(Date, na.rm=T), ymax=max(Date, na.rm=T)))
+    textdata$text[is.na(textdata$text)] <- " "
+    textdata$facet <- textdata[,input$compare]
+    
     plant.dates <- ydm(paste0("2000-", input$planting))
     second(longdata.sub$Date) <- (longdata.sub$PlantDay%in%input$planting)*(longdata.sub$Stage=="Planting")*sample(1:2, nrow(longdata.sub), replace=T)
     
@@ -56,9 +74,9 @@ shinyServer(function(input, output, session) {
     
     quantile.sub <- longdata.sub %>% 
       group_by(Location, PlantDay, MG, Stage, facet) %>% 
-      summarize(q25=floor_date(quantile(Date, .25), "day"),
-                q50=floor_date(quantile(Date, .5), "day"), 
-                q75=floor_date(quantile(Date, .75), "day"))
+      summarize(q25=floor_date(quantile(Date, .25, na.rm=T), "day"),
+                q50=floor_date(quantile(Date, .5, na.rm=T), "day"), 
+                q75=floor_date(quantile(Date, .75, na.rm=T), "day"))
     
     frost.date.df <- data.frame(frost.date.lb = 
                                   quantile(filter(yield, Location == input$location & 
@@ -75,8 +93,9 @@ shinyServer(function(input, output, session) {
                                 y=.5, label="First Frost Likely")
 
     plot <- ggplot() + 
-      geom_crossbar(aes(x=Stage, y=q50, ymin=q25, ymax=q75, fill=factor(facet), color=factor(facet)), 
-                    alpha=.3, position="dodge", data=quantile.sub) +
+      geom_crossbar(aes(x=Stage, y=q50, ymin=q25, ymax=q75, fill=factor(facet), color=factor(facet), width=0.9), 
+                    alpha=.3, position=position_dodge(), data=quantile.sub) + 
+      geom_text(aes(x=Stage, y=ymax, ymax=ymax, label=text, color=factor(facet)), data=textdata, position=position_dodge(width=0.9), hjust=1) +
       coord_flip() + 
       scale_color_brewer(gsub("PlantDay", "Planting\nDate", input$compare), palette="Set1") + 
       scale_fill_brewer(gsub("PlantDay", "Planting\nDate", input$compare), palette="Set1") + 
@@ -86,9 +105,18 @@ shinyServer(function(input, output, session) {
       xlab("") + ylab("") + 
       geom_vline(aes(xintercept=seq(.5, 5.5, 1)), colour="grey30") +
       theme_bw() + 
-      theme(panel.grid.major.x=element_line(color="grey40"), panel.grid.minor.y=element_line(color="black")) + 
-      ggtitle(paste0("Development Timeline if Planted on ", input$planting, 
+      theme(plot.title=element_text(size=18), axis.text = element_text(size = 16), legend.title=element_text(size=16), legend.text=element_text(size=14),
+            panel.grid.major.x=element_line(color="grey40"), 
+            panel.grid.minor.y=element_line(color="black"))
+    
+    if(input$compare=="Location") {
+      plot <- plot + ggtitle(paste0("Development Timeline if Planted on ", input$planting, 
                      " (MG=", input$maturity, ")"))
+    } else if(input$compare=="MG"){
+      plot <- plot + ggtitle(paste0("Development Timeline if Planted on ", input$planting, ")"))
+    } else {
+      plot <- plot + ggtitle(paste0("Development Timeline if Planted on ", input$planting, ")"))
+    }
     print(plot)
   }, res=90)
 
