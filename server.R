@@ -63,7 +63,7 @@ shinyServer(function(input, output, session) {
       plot <- ggplot() + 
         geom_text(aes(x=0, y=0, label="Please input\na location,\nplanting date,\n and maturity group."), size=20) +
         xlab("") + ylab("") + theme_bw() + 
-        theme(axis.text=element_blank(), axis.ticks=element_blank()), title=element_blank()
+        theme(axis.text=element_blank(), axis.ticks=element_blank(), title=element_blank())
     } else {
       
       textdata <- longdata.sub%>%group_by(Location, PlantDay, MG, Stage) %>% do(fix.na.data(.))
