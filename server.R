@@ -83,10 +83,12 @@ shinyServer(function(input, output, session) {
       }
       
       quantile.sub <- longdata.sub %>% 
-        group_by(Location, PlantDay, MG, facet, Stage) %>% 
-        summarize(q25=floor_date(quantile(Date, .25, na.rm=T), "day"),
-                  q50=floor_date(quantile(Date, .5, na.rm=T), "day"), 
-                  q75=floor_date(quantile(Date, .75, na.rm=T), "day"))
+        group_by(Location, PlantDay, MG, Stage, facet) %>% 
+        do(data.frame(q25=floor_date(quantile(.$Date, .25, na.rm=T), "day"), 
+                      q50=floor_date(quantile(.$Date, .5, na.rm=T), "day"),
+                      q75=floor_date(quantile(.$Date, .75, na.rm=T), "day")))
+        
+         
       
       yield.sub <- filter(yield, MG%in%input$maturity & 
                             Location%in%input$location & 
@@ -97,9 +99,10 @@ shinyServer(function(input, output, session) {
       
       frost.date.df <- yield.sub %>% 
         group_by(Location, PlantDay, MG, facet) %>% 
-        summarize(frost.date=floor_date(quantile(Date.of.first.frost2, .5, na.rm=T), "day"), 
-                  y=.5, 
-                  label="First Frost Likely") %>% as.data.frame()
+        do(data.frame(frost.date=floor_date(quantile(.$Date.of.first.frost2, .5, na.rm=T), "day"), 
+                      y=.5, 
+                      label="First Frost Likely")) %>%
+        as.data.frame()
       hour(frost.date.df$frost.date) <- sample(0:11, nrow(frost.date.df))
       
       frost.date.df$frost.date.lb <- floor_date(quantile(filter(yield, MG%in%input$maturity & 
@@ -126,8 +129,12 @@ shinyServer(function(input, output, session) {
                       alpha=.3, data=longdata.sub, scale="width", adjust=2)
       }
       
+      label_facet <- function(x, y){
+        paste0(gsub("PlantDay", "Planting\nDate", input$compare), ": ", y)
+      }
+      
       if(input$facets){
-        plot <- plot + facet_wrap(~facet)
+        plot <- plot + facet_grid(.~facet, labeller=labeller(facet=label_facet))
       }
       
       plot <- plot + 
@@ -147,6 +154,15 @@ shinyServer(function(input, output, session) {
               panel.grid.major.x=element_line(color="grey40"), 
               panel.grid.minor.y=element_line(color="black")) +  
         ggtitle("Development Timeline of Soybeans")
+      
+      if(input$compare=="Location") {
+        plot <- plot + 
+          geom_segment(aes(y=frost.date, yend=frost.date, x=y+.25, xend=Inf, 
+                           color=factor(facet)), data=frost.date.df, linetype=2)
+      } else {
+        plot <- plot + 
+          geom_segment(aes(y=med.frost, yend=med.frost, x=y+.25, xend=Inf), data=frost.date.df[1,], linetype=2)
+      }
     }
     print(plot)
   })
