@@ -154,9 +154,9 @@ shinyServer(function(input, output, session) {
       } else if(input$compare=="MG"){
         plot <- plot + 
           geom_segment(aes(y=med.frost, yend=med.frost, x=y+.25, xend=Inf), data=frost.date.df[1,], linetype=2) + 
-          ggtitle(paste0("Development Timeline if Planted on ", input$planting, ")"))
+          ggtitle(paste0("Development Timeline if Planted on ", input$planting))
       } else {
-        plot <- plot + ggtitle(paste0("Development Timeline if Planted on ", input$planting, ")"))
+        plot <- plot + ggtitle(paste0("Development Timeline for MG ", input$maturity, " in ", input$location))
       }
     }
     print(plot)
