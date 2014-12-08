@@ -1,6 +1,7 @@
 library(shiny)
 library(ggplot2)
 library(reshape2)
+library(plyr)
 library(dplyr)
 library(lubridate)
 library(stringr)
@@ -17,6 +18,7 @@ fix.na.data <- function(df){
   }
   return(ret)
 }
+
 
 # enlarge font for session 
 theme_set(theme_bw(24))
@@ -165,7 +167,7 @@ shinyServer(function(input, output, session) {
       plotdata <- filter(plotdata, Comment!="failure")
     }
     
-    plotdata <- plotdata %>% group_by(facet) %>% mutate(nyield=Yield/max(Yield))
+    plotdata <- plotdata %>% group_by(facet) %>% mutate(nyield=Yield/max(Yield)) %>% as.data.frame
     plotdata$jitterMG <- jitter(plotdata$MG)
     
     spline.data <- plotdata %>% group_by(facet) %>% do({
@@ -183,38 +185,43 @@ shinyServer(function(input, output, session) {
   
     if(nrow(spline.max)>1 & length(unique(spline.max$MG))<nrow(spline.max)){
       spline.max$MG <- spline.max$MG + seq(-.05, .05, length.out = nrow(spline.max))
-    }
-    
-    
-    
+    }    
     
     if(input$points){
-      if(sum(is.na(plotdata$facet))>0){
-        plot <- ggplot() + 
-          geom_point(data=plotdata, aes(x=jitterMG, y=nyield), alpha=.25)
-#           geom_boxplot(data=plotdata, aes(x=factor(MG), y=nyield), alpha=.25) 
-      } else {
-        plot <- ggplot() + 
-          geom_point(data=plotdata, aes(x=jitterMG, y=nyield), alpha=.25) 
-#           geom_boxplot(data=plotdata, aes(x=factor(MG), y=nyield, colour=facet), position=position_dodge(width=0.9), fill=NA) 
-      }
+      plot <- ggplot() + 
+        geom_point(data=plotdata, aes(x=jitterMG, y=nyield), alpha=.25) 
     } else {
       plot <- ggplot()
     }
-
-    if(sum(is.na(plotdata$facet))>0){
-      plot <- plot + 
-        geom_line(data=spline.data, aes(x=jitterMG, y=fit.lwr), linetype=2) + 
-        geom_line(data=spline.data, aes(x=jitterMG, y=fit.upr), linetype=2)  + 
-        geom_line(data=spline.data, aes(x=jitterMG, y=fit.fit))
+    if(input$plottype2=="2"){
+      if(sum(is.na(plotdata$facet))>0){
+        plot <- plot + 
+          geom_line(data=spline.data, aes(x=jitterMG, y=fit.lwr), linetype=2) + 
+          geom_line(data=spline.data, aes(x=jitterMG, y=fit.upr), linetype=2)  + 
+          geom_line(data=spline.data, aes(x=jitterMG, y=fit.fit), size=2)
+      } else {
+        plot <- plot + 
+          geom_line(data=spline.data, aes(x=jitterMG, y=fit.lwr, colour=factor(facet)), linetype=2) + 
+          geom_line(data=spline.data, aes(x=jitterMG, y=fit.upr, colour=factor(facet)), linetype=2)  + 
+          geom_line(data=spline.data, aes(x=jitterMG, y=fit.fit, colour=factor(facet)), size=2, alpha=1/sqrt(nrow(spline.max))) +
+          scale_colour_brewer(gsub("PlantDay", "Planting\nDate", input$compare),palette="Set1") + 
+          geom_segment(data=spline.max, aes(x=MG, y=fit.fit, xend=MG, yend=0, colour=factor(facet), ymax=fit.fit), linetype=3, size=2)
+      }
     } else {
-      plot <- plot + 
-        geom_line(data=spline.data, aes(x=jitterMG, y=fit.lwr, colour=factor(facet)), linetype=2) + 
-        geom_line(data=spline.data, aes(x=jitterMG, y=fit.upr, colour=factor(facet)), linetype=2)  + 
-        geom_line(data=spline.data, aes(x=jitterMG, y=fit.fit, colour=factor(facet))) +
-        scale_colour_brewer(gsub("PlantDay", "Planting\nDate", input$compare),palette="Set1") + 
-        geom_segment(data=spline.max, aes(x=MG, y=fit.fit, xend=MG, yend=0, colour=factor(facet), ymax=fit.fit), linetype=3)
+      if(sum(is.na(plotdata$facet))>0){
+        plot <- plot + 
+          geom_boxplot(data=plotdata, aes(x=MG, y=nyield, group=round_any(MG, 1)), fill=NA)
+      } else {
+        plot <- plot + 
+          geom_boxplot(data=plotdata, aes(x=MG, y=nyield, colour=factor(facet), 
+                                          group=interaction(factor(facet), round_any(MG, 1))), 
+                       fill=NA, position=position_dodge()) + 
+          scale_colour_brewer(gsub("PlantDay", "Planting\nDate", input$compare),palette="Set1")
+        if(length(unique(plotdata$facet))>1)
+          plot <- plot + geom_vline(aes(xintercept=-1:5+.5), colour="grey30")
+      }
     }
+    
     plot <- plot + 
         scale_y_continuous(breaks=c(0, .25, .5, .75, 1), name="Relative Yield", limits=c(0, 1.1)) + 
         scale_x_continuous(breaks=0:5, labels=0:5, name="Maturity Group") + 
@@ -266,20 +273,20 @@ shinyServer(function(input, output, session) {
     } else {
       plot <- ggplot()
     }
-    
     if(sum(is.na(plotdata$facet))>0){
       plot <- plot + 
         geom_line(data=spline.data, aes(x=jitterDate, y=fit.lwr), linetype=2) + 
         geom_line(data=spline.data, aes(x=jitterDate, y=fit.upr), linetype=2) + 
-        geom_line(data=spline.data, aes(x=jitterDate, y=fit.fit))
+        geom_line(data=spline.data, aes(x=jitterDate, y=fit.fit), size=2)
     } else {
       plot <- plot + 
         geom_line(data=spline.data, aes(x=jitterDate, y=fit.lwr, colour=factor(facet)), linetype=2) + 
         geom_line(data=spline.data, aes(x=jitterDate, y=fit.upr, colour=factor(facet)), linetype=2) + 
-        geom_line(data=spline.data, aes(x=jitterDate, y=fit.fit, colour=factor(facet))) + 
+        geom_line(data=spline.data, aes(x=jitterDate, y=fit.fit, colour=factor(facet)), size=2, alpha=1/sqrt(nrow(spline.max))) + 
         scale_colour_brewer(gsub("PlantDay", "Planting\nDate", input$compare),palette="Set1") + 
-        geom_segment(data=spline.max, aes(x=jitterDate, y=fit.fit, xend=jitterDate, yend=0, colour=factor(facet)), linetype=3)
+        geom_segment(data=spline.max, aes(x=jitterDate, y=fit.fit, xend=jitterDate, yend=0, colour=factor(facet)), linetype=3, size=2)
     }
+    
     plot <- plot + 
         scale_y_continuous(breaks=c(0, .25, .5, .75, 1), name="Relative Yield", limits=c(0, 1.1)) + 
         scale_x_continuous("", breaks=c(92, 122, 153, 183, 214, 245), 
