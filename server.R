@@ -22,7 +22,6 @@ fix.na.data <- function(df){
 theme_set(theme_bw(24))
 
 shinyServer(function(input, output, session) {
-  
   observe({
     if(input$compare=="Location"){
       updateSelectizeInput(session, "location", options=list(maxItems=3))
@@ -180,9 +179,10 @@ shinyServer(function(input, output, session) {
     }
     
     plotdata <- plotdata %>% group_by(facet) %>% mutate(nyield=Yield/max(Yield))
-    plotdata$jitterMG <- jitter(plotdata$MG)+1
+    plotdata$jitterMG <- jitter(plotdata$MG)
     
     spline.data <- plotdata %>% group_by(facet) %>% do({
+      set.seed(9852996)
       bx3 <- cbind(I=1, ns(.$jitterMG, df=3)) 
       cubicspline3 <- lm(data=., nyield~bx3-1)
       tmp <- data.frame(MG=.$MG, jitterMG=.$jitterMG)
@@ -194,9 +194,9 @@ shinyServer(function(input, output, session) {
       .[which.max(.$fit.fit),]
     })
   
-#     if(nrow(spline.max)>1 & length(unique(spline.max$MG))<nrow(spline.max)){
-#       spline.max$MG <- spline.max$MG + seq(-.05, .05, length.out = nrow(spline.max))
-#     }
+    if(nrow(spline.max)>1 & length(unique(spline.max$MG))<nrow(spline.max)){
+      spline.max$MG <- spline.max$MG + seq(-.05, .05, length.out = nrow(spline.max))
+    }
     
     
     
@@ -204,10 +204,12 @@ shinyServer(function(input, output, session) {
     if(input$points){
       if(sum(is.na(plotdata$facet))>0){
         plot <- ggplot() + 
-          geom_boxplot(data=plotdata, aes(x=factor(MG), y=nyield), alpha=.25) 
+          geom_point(data=plotdata, aes(x=jitterMG, y=nyield), alpha=.25)
+#           geom_boxplot(data=plotdata, aes(x=factor(MG), y=nyield), alpha=.25) 
       } else {
         plot <- ggplot() + 
-          geom_boxplot(data=plotdata, aes(x=factor(MG), y=nyield, colour=facet), position=position_dodge(width=0.9), fill=NA) 
+          geom_point(data=plotdata, aes(x=jitterMG, y=nyield), alpha=.25) 
+#           geom_boxplot(data=plotdata, aes(x=factor(MG), y=nyield, colour=facet), position=position_dodge(width=0.9), fill=NA) 
       }
     } else {
       plot <- ggplot()
@@ -224,11 +226,11 @@ shinyServer(function(input, output, session) {
         geom_line(data=spline.data, aes(x=jitterMG, y=fit.upr, colour=factor(facet)), linetype=2)  + 
         geom_line(data=spline.data, aes(x=jitterMG, y=fit.fit, colour=factor(facet))) +
         scale_colour_brewer(gsub("PlantDay", "Planting\nDate", input$compare),palette="Set1") + 
-        geom_segment(data=spline.max, aes(x=factor(MG, levels=0:5), y=fit.fit, xend=factor(MG, levels=0:5), yend=0, colour=factor(facet), ymax=fit.fit), position=position_dodge(width=0.9), linetype=3)
+        geom_segment(data=spline.max, aes(x=MG, y=fit.fit, xend=MG, yend=0, colour=factor(facet), ymax=fit.fit), linetype=3)
     }
     plot <- plot + 
         scale_y_continuous(breaks=c(0, .25, .5, .75, 1), name="Relative Yield", limits=c(0, 1.1)) + 
-        scale_x_discrete(breaks=0:5, labels=0:5, name="Maturity Group") + 
+        scale_x_continuous(breaks=0:5, labels=0:5, name="Maturity Group") + 
         theme_bw() + 
         theme(plot.title = element_text(size = 18), 
               legend.title = element_text(size = 16), 
@@ -259,6 +261,7 @@ shinyServer(function(input, output, session) {
     plotdata$jitterDate <- yday(plotdata$Planting2)
     
     spline.data <- plotdata %>% group_by(facet) %>% do({
+      set.seed(9852996)
       bx5 <- cbind(I=1, ns(.$jitterDate, df=5)) 
       cubicspline5 <- lm(data=., nyield~bx5-1)
       tmp <- data.frame(jitterDate=.$jitterDate)
