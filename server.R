@@ -11,7 +11,7 @@ load("Data/serverStart.rda")
 fix.na.data <- function(df){
   ret <- unique(df[,c("Location", "PlantDay", "MG", "Stage")])
   if(sum(!is.na(df$Date))>0){
-    " " 
+    ret$text <- " " 
   } else {
     ret$text <- "Not Achieved"
   }
@@ -60,7 +60,9 @@ shinyServer(function(input, output, session) {
     
     textdata <- longdata.sub%>%group_by(Location, PlantDay, MG, Stage) %>% do(fix.na.data(.))
     textdata <- merge(textdata, longdata.sub%>%group_by(Stage)%>%summarize(y=mean(Date, na.rm=T), ymax=max(Date, na.rm=T)))
-    textdata$text[is.na(textdata$text)] <- " "
+    if(sum(is.na(textdata$text))>0){
+      textdata$text[is.na(textdata$text)] <- " "
+    }
     textdata$facet <- textdata[,input$compare]
     
     plant.dates <- ydm(paste0("2000-", input$planting))
@@ -131,9 +133,9 @@ shinyServer(function(input, output, session) {
       plotdata$facet <- NA
     }
     
-    if(!input$failed){
+#     if(!input$failed){
       plotdata <- filter(plotdata, Comment!="failure")
-    }
+#     }
     
     plotdata <- plotdata %>% group_by(facet) %>% mutate(nyield=Yield/max(Yield))
     plotdata$jitterMG <- jitter(plotdata$MG)
@@ -184,9 +186,9 @@ shinyServer(function(input, output, session) {
       plotdata$facet <- NA
     }
     
-    if(!input$failed){
+#     if(!input$failed){
       plotdata <- filter(plotdata, Comment!="failure")
-    }
+#     }
     
     plotdata$nyield <- plotdata$Yield/max(plotdata$Yield)
     plotdata$jitterDate <- yday(plotdata$Planting2)
