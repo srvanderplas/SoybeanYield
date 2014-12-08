@@ -36,14 +36,19 @@ shinyUI(fluidPage(
                                   choices=0:5, selected=2, multiple=TRUE, options=list(maxItems=3))))
     )),
   fluidRow(
+    column(10, 
     plotOutput("DevelopmentPlot", height=400),
     div(align="center", 
         helpText("This plot shows the temporal distribution of each maturity stage by maturity group and planting date. 
                  The boxes shown indicate the 25th, and 75th percentiles, with an additional line indicating the median."))),
+    column(2, br(), br(), wellPanel(radioButtons("plottype", "Phenology Plot Type", choices=c("Box Plot" = 1, "Violin Plot" = 2), selected=1), br(), checkboxInput("facets", "Show Facets in Phenology Plot", value=FALSE)))),
   fluidRow(
     column(4, offset=1, 
            plotOutput("YieldByMGPlot", height=300)), 
-    column(4, offset=2,
+    column(2, br(),br(),wellPanel(h5("Plot Options"),
+           checkboxInput("points", label="Show Points"),
+           checkboxInput("failed", label="Include Failed Trials?"))),
+    column(4,
            plotOutput("YieldByPlantingPlot", height=300))
     ),
   fluidRow(
@@ -53,13 +58,5 @@ shinyUI(fluidPage(
     column(6,
            div(align="center", helpText("This plot shows the decline in (relative) yield with later planting dates, for a specified maturity group."))
            )
-    ),
-    wellPanel(
-      fluidRow(
-        column(2, offset=1, h4("Plot Options")),
-        column(2, radioButtons("plottype", "Phenology Plot Type", choices=c("Box Plot" = 1, "Violin Plot" = 2), selected=1)),
-        column(1, checkboxInput("facets", "Show Facets in Phenology Plot", value=FALSE)), 
-        column(1, offset=1, checkboxInput("points", label="Show Points")),
-        column(2, checkboxInput("failed", label="Include Failed Trials?"))
-      ))
+    )
 ))
