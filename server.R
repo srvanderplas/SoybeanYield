@@ -59,73 +59,79 @@ shinyServer(function(input, output, session) {
     longdata.sub$Location <- factor(longdata.sub$Location, levels=input$location, ordered = T)
     longdata.sub$facet <- longdata.sub[,input$compare]
     
-
-    
-    textdata <- longdata.sub%>%group_by(Location, PlantDay, MG, Stage) %>% do(fix.na.data(.))
-    textdata <- merge(textdata, longdata.sub%>%group_by(Stage)%>%summarize(y=mean(Date, na.rm=T), ymax=max(Date, na.rm=T)))
-    if(sum(is.na(textdata$text))>0){
-      textdata$text[is.na(textdata$text)] <- " "
-    }
-    textdata$facet <- textdata[,input$compare]
-    
-    plant.dates <- ydm(paste0("2000-", input$planting))
-    second(longdata.sub$Date) <- (longdata.sub$PlantDay%in%input$planting)*(longdata.sub$Stage=="Planting")*sample(1:2, nrow(longdata.sub), replace=T)
-    
-    if(length(input$planting)<2){
-      plant.dates.df <- data.frame(x=plant.dates, y=.5, yend=1.5, facet=unique(longdata.sub$facet))
+    if(nrow(longdata.sub)==0){
+      plot <- ggplot() + 
+        geom_text(aes(x=0, y=0, label="Please input\na location,\nplanting date,\n and maturity group."), size=20) +
+        xlab("") + ylab("") + theme_bw() + 
+        theme(axis.text=element_blank(), axis.ticks=element_blank()), title=element_blank()
     } else {
-      plant.dates.df <- data.frame(x=plant.dates, y=.5, yend=1.5, facet=unique(input$planting))
-    }
-    
-    quantile.sub <- longdata.sub %>% 
-      group_by(Location, PlantDay, MG, Stage, facet) %>% 
-      summarize(q25=floor_date(quantile(Date, .25, na.rm=T), "day"),
-                q50=floor_date(quantile(Date, .5, na.rm=T), "day"), 
-                q75=floor_date(quantile(Date, .75, na.rm=T), "day"))
-    
-    frost.date.df <- filter(yield, MG%in%input$maturity & 
-                              Location%in%input$location & 
-                              PlantDay%in%input$planting) %>% 
-      group_by(Location, PlantDay, MG) %>% 
-      summarize(frost.date=floor_date(quantile(Date.of.first.frost2, .5, na.rm=T), "day"), 
-                y=.5, 
-                label="First Frost Likely") %>% as.data.frame()
-    
-    frost.date.df$frost.date.lb <- floor_date(quantile(filter(yield, MG%in%input$maturity & 
-                                                                Location%in%input$location & 
-                                                                PlantDay%in%input$planting)$Date.of.first.frost2, 
-                                                       .25, na.rm=T), "day")
-    frost.date.df$frost.date.ub <- floor_date(quantile(filter(yield, MG%in%input$maturity & 
-                                                                Location%in%input$location & 
-                                                                PlantDay%in%input$planting)$Date.of.first.frost2, 
-                                                       .75, na.rm=T), "day")
-    frost.date.df$textlabel <- median(frost.date.df$frost.date)
-    frost.date.df$facet <- frost.date.df[,input$compare]
-
-    plot <- ggplot() + 
-      geom_crossbar(aes(x=Stage, y=q50, ymin=q25, ymax=q75, fill=factor(facet), color=factor(facet), width=0.9), 
-                    alpha=.3, position=position_dodge(), data=quantile.sub) + 
-      geom_text(aes(x=Stage, y=ymax, ymax=ymax, label=text, color=factor(facet)), data=textdata, position=position_dodge(width=0.9), hjust=1) +
-      coord_flip() + 
-      scale_color_brewer(gsub("PlantDay", "Planting\nDate", input$compare), palette="Set1") + 
-      scale_fill_brewer(gsub("PlantDay", "Planting\nDate", input$compare), palette="Set1") + 
-      geom_rect(aes(ymin=frost.date.lb, ymax=frost.date.ub, xmin=-Inf, xmax=Inf), alpha=.1, fill="black", data=frost.date.df) +  
-      geom_segment(aes(y=frost.date, yend=frost.date, x=y+.25, xend=Inf, color=facet), data=frost.date.df, linetype=2) + 
-      geom_text(aes(y=textlabel, x=y, label=label), data=frost.date.df, hjust=1, vjust=0) + 
-      xlab("") + ylab("") + 
-      geom_vline(aes(xintercept=seq(.5, 5.5, 1)), colour="grey30") +
-      theme_bw() + 
-      theme(plot.title=element_text(size=18), axis.text = element_text(size = 16), legend.title=element_text(size=16), legend.text=element_text(size=14),
-            panel.grid.major.x=element_line(color="grey40"), 
-            panel.grid.minor.y=element_line(color="black"))
-    
-    if(input$compare=="Location") {
-      plot <- plot + ggtitle(paste0("Development Timeline if Planted on ", input$planting, 
-                     " (MG=", input$maturity, ")"))
-    } else if(input$compare=="MG"){
-      plot <- plot + ggtitle(paste0("Development Timeline if Planted on ", input$planting, ")"))
-    } else {
-      plot <- plot + ggtitle(paste0("Development Timeline if Planted on ", input$planting, ")"))
+      
+      textdata <- longdata.sub%>%group_by(Location, PlantDay, MG, Stage) %>% do(fix.na.data(.))
+      textdata <- merge(textdata, longdata.sub%>%group_by(Stage)%>%summarize(y=mean(Date, na.rm=T), ymax=max(Date, na.rm=T)))
+      if(sum(is.na(textdata$text))>0){
+        textdata$text[is.na(textdata$text)] <- " "
+      }
+      textdata$facet <- textdata[,input$compare]
+      
+      plant.dates <- ydm(paste0("2000-", input$planting))
+      second(longdata.sub$Date) <- (longdata.sub$PlantDay%in%input$planting)*(longdata.sub$Stage=="Planting")*sample(1:2, nrow(longdata.sub), replace=T)
+      
+      if(length(input$planting)<2){
+        plant.dates.df <- data.frame(x=plant.dates, y=.5, yend=1.5, facet=unique(longdata.sub$facet))
+      } else {
+        plant.dates.df <- data.frame(x=plant.dates, y=.5, yend=1.5, facet=unique(input$planting))
+      }
+      
+      quantile.sub <- longdata.sub %>% 
+        group_by(Location, PlantDay, MG, Stage, facet) %>% 
+        summarize(q25=floor_date(quantile(Date, .25, na.rm=T), "day"),
+                  q50=floor_date(quantile(Date, .5, na.rm=T), "day"), 
+                  q75=floor_date(quantile(Date, .75, na.rm=T), "day"))
+      
+      frost.date.df <- filter(yield, MG%in%input$maturity & 
+                                Location%in%input$location & 
+                                PlantDay%in%input$planting) %>% 
+        group_by(Location, PlantDay, MG) %>% 
+        summarize(frost.date=floor_date(quantile(Date.of.first.frost2, .5, na.rm=T), "day"), 
+                  y=.5, 
+                  label="First Frost Likely") %>% as.data.frame()
+      
+      frost.date.df$frost.date.lb <- floor_date(quantile(filter(yield, MG%in%input$maturity & 
+                                                                  Location%in%input$location & 
+                                                                  PlantDay%in%input$planting)$Date.of.first.frost2, 
+                                                         .25, na.rm=T), "day")
+      frost.date.df$frost.date.ub <- floor_date(quantile(filter(yield, MG%in%input$maturity & 
+                                                                  Location%in%input$location & 
+                                                                  PlantDay%in%input$planting)$Date.of.first.frost2, 
+                                                         .75, na.rm=T), "day")
+      frost.date.df$textlabel <- median(frost.date.df$frost.date)
+      frost.date.df$facet <- frost.date.df[,input$compare]
+      
+      plot <- ggplot() + 
+        geom_crossbar(aes(x=Stage, y=q50, ymin=q25, ymax=q75, fill=factor(facet), color=factor(facet), width=0.9), 
+                      alpha=.3, position=position_dodge(), data=quantile.sub) + 
+        geom_text(aes(x=Stage, y=ymax, ymax=ymax, label=text, color=factor(facet)), data=textdata, position=position_dodge(width=0.9), hjust=1) +
+        coord_flip() + 
+        scale_color_brewer(gsub("PlantDay", "Planting\nDate", input$compare), palette="Set1") + 
+        scale_fill_brewer(gsub("PlantDay", "Planting\nDate", input$compare), palette="Set1") + 
+        geom_rect(aes(ymin=frost.date.lb, ymax=frost.date.ub, xmin=-Inf, xmax=Inf), alpha=.1, fill="black", data=frost.date.df) +  
+        geom_segment(aes(y=frost.date, yend=frost.date, x=y+.25, xend=Inf, color=facet), data=frost.date.df, linetype=2) + 
+        geom_text(aes(y=textlabel, x=y, label=label), data=frost.date.df, hjust=1, vjust=0) + 
+        xlab("") + ylab("") + 
+        geom_vline(aes(xintercept=seq(.5, 5.5, 1)), colour="grey30") +
+        theme_bw() + 
+        theme(plot.title=element_text(size=18), axis.text = element_text(size = 16), legend.title=element_text(size=16), legend.text=element_text(size=14),
+              panel.grid.major.x=element_line(color="grey40"), 
+              panel.grid.minor.y=element_line(color="black"))
+      
+      if(input$compare=="Location") {
+        plot <- plot + ggtitle(paste0("Development Timeline if Planted on ", input$planting, 
+                                      " (MG=", input$maturity, ")"))
+      } else if(input$compare=="MG"){
+        plot <- plot + ggtitle(paste0("Development Timeline if Planted on ", input$planting, ")"))
+      } else {
+        plot <- plot + ggtitle(paste0("Development Timeline if Planted on ", input$planting, ")"))
+      }
     }
     print(plot)
   }, res=90)
