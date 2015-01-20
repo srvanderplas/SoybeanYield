@@ -121,8 +121,9 @@ shinyServer(function(input, output, session) {
       
       if(input$plottype=="1"){
         plot <- ggplot() + 
-          geom_crossbar(aes(x=Stage, y=q50, ymin=q25, ymax=q75, fill=factor(facet), color=factor(facet), width=0.9), 
-                        alpha=.3, position=position_dodge(), data=quantile.sub) 
+          stat_boxplot(aes(x=Stage, y=Date, fill=factor(facet), color=factor(facet)), alpha=.3, position=position_dodge(), data=longdata.sub)
+#           geom_crossbar(aes(x=Stage, y=q50, ymin=q25, ymax=q75, fill=factor(facet), color=factor(facet), width=0.9), 
+#                         alpha=.3, position=position_dodge(), data=quantile.sub) 
       } else {
         plot <- ggplot() + 
           geom_violin(aes(x=Stage, y=Date, fill=factor(facet), color=factor(facet)), 
