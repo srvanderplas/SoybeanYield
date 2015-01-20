@@ -5,7 +5,7 @@ library(dplyr)
 library(lubridate)
 library(stringr)
 
-yield <- read.csv("./Data/SoybeanYieldData.csv", stringsAsFactors=F)
+yield <- read.csv("./Data/IowaAnalysis3.csv", stringsAsFactors=F)
 yield$id <- 1:nrow(yield)
 yield$PlantDay <- yield$Planting
 yield$Planting2 <- dmy(paste0(yield$Planting, "-2000"))
