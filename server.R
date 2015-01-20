@@ -98,11 +98,6 @@ shinyServer(function(input, output, session) {
                              PlantDay%in%input$planting) 
     longdata.sub$Location <- factor(longdata.sub$Location, levels=input$location, ordered = T)
     longdata.sub$facet <- longdata.sub[,input$compare]
-    if(input$newdata){
-      newdata <- subset(longdata.sub, Year==2014)
-    } else {
-      newdata <- data.frame()
-    }
     
     if(nrow(longdata.sub)==0){
       plot <- ggplot() + 
@@ -119,7 +114,6 @@ shinyServer(function(input, output, session) {
       
       plant.dates <- ydm(paste0("2000-", input$planting))
       second(longdata.sub$Date) <- (longdata.sub$PlantDay%in%input$planting)*(longdata.sub$Stage=="Planting")*sample(1:2, nrow(longdata.sub), replace=T)
-      second(newdata$Date) <- (newdata$PlantDay%in%input$planting)*(newdata$Stage=="Planting")*sample(1:2, nrow(newdata), replace=T)
       
       if(length(input$planting)<2){
         plant.dates.df <- data.frame(x=plant.dates, y=.5, yend=1.5, facet=unique(longdata.sub$facet))
@@ -187,18 +181,20 @@ shinyServer(function(input, output, session) {
         plot <- plot + facet_grid(.~facet, labeller=labeller(facet=label_facet))
       }
       
-      
       if(input$newdata){
-        tmp <- newdata
-        flevels <- seq(-.4, .4, length.out=length(unique(tmp$facet))+1)
-        fjitter <- runif(nrow(tmp), 
-                         (flevels[1:length(unique(tmp$facet))])[as.numeric(droplevels(tmp$facet))],
-                         (flevels[(1:length(unique(tmp$facet)))+1])[as.numeric(droplevels(tmp$facet))])  
-        tmp$Stage <- as.numeric(tmp$Stage) + fjitter
-        plot <- plot + geom_point(aes(x=Stage, y=Date, color=factor(facet)),
-                                  size=3, data=tmp, show_guide=F)
+        newdata <- subset(longdata.sub, Year==2014)
+        if(nrow(newdata)>0){
+          tmp <- newdata
+          flevels <- seq(-.4, .4, length.out=length(unique(tmp$facet))+1)
+          fjitter <- runif(nrow(tmp), 
+                           (flevels[1:length(unique(tmp$facet))])[as.numeric(droplevels(tmp$facet))],
+                           (flevels[(1:length(unique(tmp$facet)))+1])[as.numeric(droplevels(tmp$facet))])  
+          tmp$Stage <- as.numeric(tmp$Stage) + fjitter
+          plot <- plot + geom_point(aes(x=Stage, y=Date, color=factor(facet)),
+                                    size=3, data=tmp, show_guide=F)
+        }
       }
-
+      
       plot <- plot + 
         geom_text(aes(x=Stage, y=ymax, ymax=ymax, label=text, color=factor(facet)), 
                   data=textdata, position=position_dodge(width=0.9), hjust=1, show_guide=F) +
@@ -247,15 +243,10 @@ shinyServer(function(input, output, session) {
       plotdata <- filter(plotdata, Comment!="failure")
     }
     
-    plotdata <- plotdata %>% group_by(facet) %>% mutate(nyield=Yield/max(Yield)) %>% as.data.frame
-    plotdata$jitterMG <- jitter(plotdata$MG)
+    plotdata <- plotdata %>% group_by(facet) %>% mutate(nyield=Yield/max(Yield, na.rm=TRUE)) %>% as.data.frame
+    plotdata$jitterMG <- jitter(plotdata$MG, amount=.2)
 
-    
-    if(input$newdata2){
-      newdata <- filter(plotdata, Year==2014)
-    } else {
-      newdata <- data.frame()
-    }
+
     
     spline.data <- plotdata %>% group_by(facet) %>% do({
       set.seed(9852996)
@@ -282,10 +273,12 @@ shinyServer(function(input, output, session) {
     }
     
     if(input$newdata2){
-      plot <- plot + 
-        geom_point(data=newdata, aes(x=jitterMG, y=nyield, color=factor(facet)), size=3, alpha=.75) 
+      newdata <- filter(plotdata, Year==2014)
+      if(nrow(newdata)>0){
+        plot <- plot + 
+          geom_point(data=newdata, aes(x=jitterMG, y=nyield, color=factor(facet)), size=3, alpha=.75) 
+      }
     }
-    
     
     if(input$plottype2=="2"){
       if(sum(is.na(plotdata$facet))>0){
@@ -304,11 +297,11 @@ shinyServer(function(input, output, session) {
     } else {
       if(sum(is.na(plotdata$facet))>0){
         plot <- plot + 
-          geom_boxplot(data=plotdata, aes(x=MG, y=nyield, group=round_any(MG, 1)), fill=NA)
+          geom_boxplot(data=plotdata, aes(x=MG, y=nyield, group=round_any(MG, .5)), fill=NA)
       } else {
         plot <- plot + 
           geom_boxplot(data=plotdata, aes(x=MG, y=nyield, colour=factor(facet), 
-                                          group=interaction(factor(facet), round_any(MG, 1))), 
+                                          group=interaction(factor(facet), round_any(MG, .5))), 
                        fill=NA, position=position_dodge()) + 
           scale_colour_brewer(gsub("PlantDay", "Planting\nDate", input$compare),palette="Set1")
         if(length(unique(plotdata$facet))>1)
@@ -346,7 +339,7 @@ shinyServer(function(input, output, session) {
       plotdata <- filter(plotdata, Comment!="failure")
     }
     
-    plotdata$nyield <- plotdata$Yield/max(plotdata$Yield)
+    plotdata$nyield <- plotdata$Yield/max(plotdata$Yield, na.rm=TRUE)
     plotdata$jitterDate <- yday(plotdata$Planting2)
     
     spline.data <- plotdata %>% group_by(facet) %>% do({
@@ -368,6 +361,16 @@ shinyServer(function(input, output, session) {
     } else {
       plot <- ggplot()
     }
+    
+    
+    if(input$newdata2){
+      newdata <- filter(plotdata, Year==2014)
+      if(nrow(newdata)>0){
+        plot <- plot + 
+          geom_point(data=newdata, aes(x=jitterDate, y=nyield, color=factor(facet)), size=3, alpha=.75) 
+      }
+    }
+    
     if(sum(is.na(plotdata$facet))>0){
       plot <- plot + 
         geom_line(data=spline.data, aes(x=jitterDate, y=fit.lwr), linetype=2) + 
