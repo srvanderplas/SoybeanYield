@@ -99,13 +99,7 @@ shinyServer(function(input, output, session) {
     longdata.sub$Location <- factor(longdata.sub$Location, levels=input$location, ordered = T)
     longdata.sub$facet <- longdata.sub[,input$compare]
     if(input$newdata){
-      newdata <- subset(longyield, 
-                          MG%in%input$maturity & 
-                          Location%in%input$location & 
-                          PlantDay%in%input$planting & 
-                          Year==2014)
-      newdata$Location <- factor(newdata$Location, levels=input$location, ordered = T)
-      newdata$facet <- newdata[,input$compare]
+      newdata <- subset(longdata.sub, Year==2014)
     } else {
       newdata <- data.frame()
     }
@@ -255,6 +249,13 @@ shinyServer(function(input, output, session) {
     
     plotdata <- plotdata %>% group_by(facet) %>% mutate(nyield=Yield/max(Yield)) %>% as.data.frame
     plotdata$jitterMG <- jitter(plotdata$MG)
+
+    
+    if(input$newdata2){
+      newdata <- filter(plotdata, Year==2014)
+    } else {
+      newdata <- data.frame()
+    }
     
     spline.data <- plotdata %>% group_by(facet) %>% do({
       set.seed(9852996)
@@ -279,6 +280,13 @@ shinyServer(function(input, output, session) {
     } else {
       plot <- ggplot()
     }
+    
+    if(input$newdata2){
+      plot <- plot + 
+        geom_point(data=newdata, aes(x=jitterMG, y=nyield, color=factor(facet)), size=3, alpha=.75) 
+    }
+    
+    
     if(input$plottype2=="2"){
       if(sum(is.na(plotdata$facet))>0){
         plot <- plot + 
