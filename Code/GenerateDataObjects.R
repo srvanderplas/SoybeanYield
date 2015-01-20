@@ -11,6 +11,8 @@ yield$PlantDay <- yield$Planting
 yield$Planting2 <- dmy(paste0(yield$Planting, "-2000"))
 yield$PlantDay <- factor(yield$PlantDay, levels=unique(yield$PlantDay)[order(ydm(paste0("2000-", unique(yield$PlantDay))))])
 yield$Date.of.first.frost2 <- dmy(paste0(yield$Date.of.first.frost, "-2000"))
+yield$MG <- as.character(gsub("MG", "", yield$MG))
+yield$MG <- (nchar(yield$MG)==1)*as.numeric(yield$MG) + (nchar(yield$MG)==2)*(as.numeric(yield$MG)/10)
 
 longyield <- melt(yield, id.vars=c(1,2,3,5,17:20), measure.vars=c(4,6:10), variable.name="Stage", value.name="Date")
 longyield$Date <- paste0(longyield$Date, "-2000")
