@@ -37,23 +37,30 @@ shinyUI(fluidPage(
       ),
     column(2, br(), br(), 
            wellPanel(
-             h4("Phenology Plot Options"),
+             h4("Plot Options"),
              radioButtons("plottype", "Plot Type", choices=c("Box Plot" = 1, "Violin Plot" = 2), selected=1), 
              br(), 
-             checkboxInput("facets", "Show Facets", value=FALSE))
+             checkboxInput("facets", "Show Facets", value=FALSE),
+             br(),
+             checkboxInput("newdata", "Show 2014 measured data (if available)", value=FALSE),
+             br())
            )
     ),
   fluidRow(
     column(4, offset=1, 
            plotOutput("YieldByMGPlot", height=300)), 
     column(2, br(),br(),
-           wellPanel(h4("Plot Options"),
-                     h5("Relative Yield by MG Plot:"),
-                     radioButtons("plottype2", "Type", choices=c("Fitted Line"=2, "Box Plot" = 1), selected=2),
-                     br(),
-                     h5("Both Plots:"),
-                     checkboxInput("points", label="Show Points"),
-                     checkboxInput("failed", label="Include Failed Trials?"))),
+           wellPanel(
+             h4("Plot Options"),
+             h5("Relative Yield by MG Plot:"),
+             radioButtons("plottype2", "Type", choices=c("Fitted Line"=2, "Box Plot" = 1), selected=2),
+             br(),
+             h5("Both Plots:"),
+             checkboxInput("points", label="Show Points"),
+             checkboxInput("failed", label="Include Failed Trials?"),
+             checkboxInput("newdata2", "Show 2014 measured data (if available)", value=FALSE),
+             br())
+           ),
     column(4,
            plotOutput("YieldByPlantingPlot", height=300))
     ),
