@@ -23,17 +23,9 @@ shinyUI(fluidPage(
       column(4, offset=1, p("Click on the boxes below to see what options are available."),
                 p("You can type or select options to add them (use backspace to remove a selected option)."),
                 p("You may select up to three values for the variable chosen as the comparison variable.")),
-      column(2,div(align="center", 
-                   selectizeInput("location", label="Select location(s)", 
-                                  choices=locations, selected="Ames", 
-                                  multiple=TRUE, options=list(maxItems=3)))),
-      column(2,div(align="center", 
-                   selectizeInput("planting", label="Select planting date(s)", 
-                                  choices=planting.date, selected="15-May", 
-                                  multiple=TRUE, options=list(maxItems=3)))),
-      column(2,div(align="center", 
-                   selectizeInput("maturity", label="Select maturity group(s)", 
-                                  choices=0:5, selected=2, multiple=TRUE, options=list(maxItems=3))))
+      column(2,div(align="center", uiOutput("location"))),
+      column(2,div(align="center", uiOutput("planting"))),
+      column(2,div(align="center", uiOutput("maturity")))
     )),
   fluidRow(
     column(10, 

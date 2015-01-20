@@ -24,33 +24,72 @@ fix.na.data <- function(df){
 theme_set(theme_bw(24))
 
 shinyServer(function(input, output, session) {
-  observe({
-    if(input$compare=="Location"){
-      updateSelectizeInput(session, "location", options=list(maxItems=3))
-    } else {
-      updateSelectizeInput(session, "location", 
-                           selected=input$location[1], 
-                           options=list(maxItems=1))
-    }  
-    
-    if(input$compare=="PlantDay"){
-      updateSelectizeInput(session, "planting", options=list(maxItems=3))
-    } else {
-      updateSelectizeInput(session, "planting", 
-                           selected=input$planting[1], 
-                           options=list(maxItems=1))
-    }  
-    
-    if(input$compare=="MG"){
-      updateSelectizeInput(session, "maturity", options=list(maxItems=3))
-    } else {
-      updateSelectizeInput(session, "maturity", 
-                           selected=input$maturity[1], 
-                           options=list(maxItems=1))
-    }  
-    
-  })
   
+  # Render output options in response to comparison variable choice
+  
+  output$location <- renderUI(
+    if(input$compare=="Location"){
+      # If location is chosen to compare, output a selectizeInput list
+      selectizeInput("location", label="Select location(s)", 
+                     choices=locations, selected="Ames", 
+                     multiple=TRUE, options=list(maxItems=3))
+    } else {
+      # If location is not chosen, but was previously chosen, 
+      # create a selectInput element with the first previously chosen value
+      # as the selected value
+      if(isolate(length(input$location)>0)){
+        selectInput("location", label="Select location(s)", 
+                    choices=locations, selected=isolate(input$location[1]))
+      } else {
+      # If location is not chosen and has never been specified, 
+      # use Ames as the default value
+        selectInput("location", label="Select location(s)", 
+                    choices=locations, selected="Ames")
+      }
+    })
+  
+  output$planting <- renderUI(
+    if(input$compare=="PlantDay"){
+      # If PlantDay is chosen to compare, output a selectizeInput list
+      selectizeInput("planting", label="Select planting date(s)", 
+                     choices=planting.date, selected="15-May", 
+                     multiple=TRUE, options=list(maxItems=3))
+    } else {
+      # If PlantDay is not chosen, but was previously chosen, 
+      # create a selectInput element with the first previously chosen value
+      # as the selected value
+      if(isolate(length(input$planting)>0)){
+        selectInput("planting", label="Select planting date(s)", 
+                    choices=planting.date, selected=isolate(input$planting[1]))
+      } else {
+        # If location is not chosen and has never been specified, 
+        # use 15-May as the default value
+        selectInput("planting", label="Select planting date(s)", 
+                    choices=planting.date, selected="15-May")
+      }
+    })
+  
+  output$maturity <- renderUI(
+    if(input$compare=="MG"){
+      # If MG is chosen to compare, output a selectizeInput list
+      selectizeInput("maturity", label="Select maturity group(s)", 
+                     choices=seq(0, 5.5, by=0.5), selected=2, 
+                     multiple=TRUE, options=list(maxItems=3))
+    } else {      
+      # If MG is not chosen, but was previously chosen, 
+      # create a selectInput element with the first previously chosen value
+      # as the selected value
+      if(isolate(length(input$maturity)>0)){
+        selectInput("maturity", label="Select maturity group(s)", 
+                    choices=seq(0, 5.5, by=0.5), selected=isolate(input$maturity[1]))
+      } else {
+        # If location is not chosen and has never been specified, 
+        # use MG=2 as the default value
+        selectInput("maturity", label="Select maturity group(s)", 
+                    choices=seq(0, 5.5, by=0.5), selected=2)
+      }
+    })
+ 
   # Plot of development progress
   output$DevelopmentPlot <- renderPlot({
     
