@@ -1,6 +1,7 @@
 # code to generate data objects for the Shiny applet
 library(ggplot2)
 library(reshape2)
+library(plyr)
 library(dplyr)
 library(lubridate)
 library(stringr)
@@ -36,6 +37,8 @@ newdata$R4 <- dm(mdy(newdata$R4))
 newdata$R7 <- dm(mdy(newdata$R7))
 newdata$R8 <- dm(mdy(newdata$R8))
 newdata$Comment <- ""
+newdata$Comment[is.na(newdata$Yield)] <- "failed"
+newdata$Yield[is.na(newdata$Yield)] <- 0
 
 yield <- rbind.fill(yield, newdata[,-which(names(newdata)%in%c("bushels", "moisture", "oldDate", "oldPlanting"))])
 
