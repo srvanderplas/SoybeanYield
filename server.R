@@ -208,7 +208,7 @@ shinyServer(function(input, output, session) {
     print(plot)
   })
 
-  
+  # Plot of Yield by MG
   output$YieldByMGPlot <- renderPlot({
     plotdata <- filter(yield, 
                        Location%in%input$location &
@@ -293,6 +293,7 @@ shinyServer(function(input, output, session) {
     print(plot)
   })
   
+  # Plot of Yield by Planting Date
   output$YieldByPlantingPlot <- renderPlot({
     plotdata <- filter(yield, 
                        Location%in%input$location &
