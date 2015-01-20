@@ -332,10 +332,7 @@ shinyServer(function(input, output, session) {
               legend.direction="horizontal") + 
         ggtitle(paste0("Relative Yield by Maturity Group"))
     }
-    
     print(plot)
-#     plot <- qplot(x=0, y=0, label="test", geom="text")
-#     print(plot)
   })
   
   # Plot of Yield by Planting Date
@@ -426,7 +423,6 @@ shinyServer(function(input, output, session) {
               legend.direction="horizontal") + 
         ggtitle(paste0("Relative Yield by Maturity Group"))
     }
-#     plot <- qplot(x=0, y=0, label="test", geom="text")
-#     print(plot)
+    print(plot)
   })
 })
