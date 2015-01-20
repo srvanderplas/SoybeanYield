@@ -14,6 +14,30 @@ yield$Date.of.first.frost2 <- dmy(paste0(yield$Date.of.first.frost, "-2000"))
 yield$MG <- as.character(gsub("MG", "", yield$MG))
 yield$MG <- (nchar(yield$MG)==1)*as.numeric(yield$MG) + (nchar(yield$MG)==2)*(as.numeric(yield$MG)/10)
 
+dm <- function(x){
+  sprintf("%i-%s", mday(x), as.character(month(x, label=T, abbr=T)))
+}
+
+plantdates <- unique(yield$Planting2)[order(unique(yield$Planting2))]
+newdata <- read.csv("./Data/2014Data.csv", stringsAsFactors=F)
+newdata$id <- (nrow(yield)+1):(nrow(yield)+nrow(newdata))
+newdata$oldPlanting <- newdata$Planting
+newdata$PlantDay <- mdy(newdata$Planting)
+year(newdata$PlantDay) <- 2000
+newdata$Planting2 <- ymd(plantdates[sapply(newdata$PlantDay, function(i) which.min(abs(as.numeric(plantdates-i))))])
+newdata$Planting <- dm(newdata$Planting2)
+newdata$PlantDay <- factor(newdata$Planting, levels=unique(yield$PlantDay)[order(ydm(paste0("2000-", unique(yield$PlantDay))))])
+newdata$Date.of.first.frost2 <- NA
+newdata$MG <- round(newdata$MG/.5)*.5
+newdata$Year <- 2014
+newdata$VE <- dm(mdy(newdata$VE))
+newdata$R1 <- dm(mdy(newdata$R1))
+newdata$R4 <- dm(mdy(newdata$R4))
+newdata$R7 <- dm(mdy(newdata$R7))
+newdata$R8 <- dm(mdy(newdata$R8))
+
+yield <- rbind.fill(yield, newdata[,-which(names(newdata)%in%c("bushels", "moisture", "oldDate", "oldPlanting"))])
+
 longyield <- melt(yield, id.vars=c(1,2,3,5,18:21), measure.vars=c(4,7:11), variable.name="Stage", value.name="Date")
 longyield$Date <- paste0(longyield$Date, "-2000")
 longyield$Date <- dmy(longyield$Date)
