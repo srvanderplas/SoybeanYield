@@ -14,7 +14,7 @@ yield$Date.of.first.frost2 <- dmy(paste0(yield$Date.of.first.frost, "-2000"))
 yield$MG <- as.character(gsub("MG", "", yield$MG))
 yield$MG <- (nchar(yield$MG)==1)*as.numeric(yield$MG) + (nchar(yield$MG)==2)*(as.numeric(yield$MG)/10)
 
-longyield <- melt(yield, id.vars=c(1,2,3,5,17:20), measure.vars=c(4,6:10), variable.name="Stage", value.name="Date")
+longyield <- melt(yield, id.vars=c(1,2,3,5,18:21), measure.vars=c(4,7:11), variable.name="Stage", value.name="Date")
 longyield$Date <- paste0(longyield$Date, "-2000")
 longyield$Date <- dmy(longyield$Date)
 longyield$Stage <- factor(longyield$Stage, 
@@ -34,3 +34,4 @@ planting.date <- unique(yield$Planting)
 planting.date <- planting.date[order(ydm(paste0("2000-", planting.date)))]
 maturity <- unique(yield$MG)
 save(locations, planting.date, maturity, file="Data/uiStart.rda")
+
