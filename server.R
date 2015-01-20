@@ -229,87 +229,86 @@ shinyServer(function(input, output, session) {
 
   # Plot of Yield by MG
   output$YieldByMGPlot <- renderPlot({
-    plotdata <- filter(yield, 
-                       Location%in%input$location &
-                       PlantDay%in%input$planting)
-    plotdata$Location <- factor(plotdata$Location, levels=input$location, ordered=T)
-    if(input$compare!="MG"){
-      plotdata$facet <- plotdata[,input$compare]
-    } else {
-      plotdata$facet <- NA
-    }
-    
-    if(!input$failed){
-      plotdata <- filter(plotdata, Comment!="failure")
-    }
-    
-    plotdata <- plotdata %>% group_by(facet) %>% mutate(nyield=Yield/max(Yield, na.rm=TRUE)) %>% as.data.frame
-    plotdata$jitterMG <- jitter(plotdata$MG, amount=.2)
-
-
-    
-    spline.data <- plotdata %>% group_by(facet) %>% do({
-      set.seed(9852996)
-      bx3 <- cbind(I=1, ns(.$jitterMG, df=3)) 
-      cubicspline3 <- lm(data=., nyield~bx3-1)
-      tmp <- data.frame(MG=.$MG, jitterMG=.$jitterMG)
-      tmp <- cbind(tmp, suppressWarnings(predict(cubicspline3, se.fit=T, interval="prediction", level=.95)))
-      tmp
-    })
-
-    spline.max <- spline.data %>% group_by(facet) %>% do({
-      .[which.max(.$fit.fit),]
-    })
-  
-    if(nrow(spline.max)>1 & length(unique(spline.max$MG))<nrow(spline.max)){
-      spline.max$MG <- spline.max$MG + seq(-.05, .05, length.out = nrow(spline.max))
-    }    
-    
-    if(input$points){
-      plot <- ggplot() + 
-        geom_point(data=plotdata, aes(x=jitterMG, y=nyield), alpha=.25) 
-    } else {
-      plot <- ggplot()
-    }
-    
-    if(input$newdata2){
-      newdata <- filter(plotdata, Year==2014)
-      if(nrow(newdata)>0){
-        plot <- plot + 
-          geom_point(data=newdata, aes(x=jitterMG, y=nyield, color=factor(facet)), size=3, alpha=.75) 
-      }
-    }
-    
-    if(input$plottype2=="2"){
-      if(sum(is.na(plotdata$facet))>0){
-        plot <- plot + 
-          geom_line(data=spline.data, aes(x=jitterMG, y=fit.lwr), linetype=2) + 
-          geom_line(data=spline.data, aes(x=jitterMG, y=fit.upr), linetype=2)  + 
-          geom_line(data=spline.data, aes(x=jitterMG, y=fit.fit), size=2)
+    if(length(input$location)>0 & length(input$planting)>0 & length(input$compare)>0){
+      plotdata <- filter(yield, 
+                         Location%in%input$location &
+                           PlantDay%in%input$planting)
+      plotdata$Location <- factor(plotdata$Location, levels=input$location, ordered=T)
+      if(input$compare!="MG"){
+        plotdata$facet <- plotdata[,input$compare]
       } else {
-        plot <- plot + 
-          geom_line(data=spline.data, aes(x=jitterMG, y=fit.lwr, colour=factor(facet)), linetype=2) + 
-          geom_line(data=spline.data, aes(x=jitterMG, y=fit.upr, colour=factor(facet)), linetype=2)  + 
-          geom_line(data=spline.data, aes(x=jitterMG, y=fit.fit, colour=factor(facet)), size=2, alpha=1/sqrt(nrow(spline.max))) +
-          scale_colour_brewer(gsub("PlantDay", "Planting\nDate", input$compare),palette="Set1") + 
-          geom_segment(data=spline.max, aes(x=MG, y=fit.fit, xend=MG, yend=0, colour=factor(facet), ymax=fit.fit), linetype=3, size=2)
+        plotdata$facet <- NA
       }
-    } else {
-      if(sum(is.na(plotdata$facet))>0){
-        plot <- plot + 
-          geom_boxplot(data=plotdata, aes(x=MG, y=nyield, group=round_any(MG, .5)), fill=NA)
+      
+      if(!input$failed){
+        plotdata <- filter(plotdata, Comment!="failure")
+      }
+      
+      plotdata <- plotdata %>% group_by(facet) %>% mutate(nyield=Yield/max(Yield)) %>% as.data.frame
+      plotdata$jitterMG <- jitter(plotdata$MG, amount=.2)
+      
+      spline.data <- plotdata %>% group_by(facet) %>% do({
+        set.seed(9852996)
+        bx3 <- cbind(I=1, ns(.$jitterMG, df=3)) 
+        cubicspline3 <- lm(data=., nyield~bx3-1)
+        tmp <- data.frame(MG=.$MG, jitterMG=.$jitterMG)
+        tmp <- cbind(tmp, suppressWarnings(predict(cubicspline3, se.fit=T, interval="prediction", level=.95)))
+        tmp
+      })
+      
+      spline.max <- spline.data %>% group_by(facet) %>% do({
+        .[which.max(.$fit.fit),]
+      })
+      
+      if(nrow(spline.max)>1 & length(unique(spline.max$MG))<nrow(spline.max)){
+        spline.max$MG <- spline.max$MG + seq(-.05, .05, length.out = nrow(spline.max))
+      }    
+      
+      if(input$points){
+        plot <- ggplot() + 
+          geom_point(data=plotdata, aes(x=jitterMG, y=nyield), alpha=.25) 
       } else {
-        plot <- plot + 
-          geom_boxplot(data=plotdata, aes(x=MG, y=nyield, colour=factor(facet), 
-                                          group=interaction(factor(facet), round_any(MG, .5))), 
-                       fill=NA, position=position_dodge()) + 
-          scale_colour_brewer(gsub("PlantDay", "Planting\nDate", input$compare),palette="Set1")
-        if(length(unique(plotdata$facet))>1)
-          plot <- plot + geom_vline(aes(xintercept=-1:5+.5), colour="grey30")
+        plot <- ggplot()
       }
-    }
-    
-    plot <- plot + 
+      
+      if(input$newdata2){
+        newdata <- filter(plotdata, Year==2014)
+        if(nrow(newdata)>0){
+          plot <- plot + 
+            geom_point(data=newdata, aes(x=jitterMG, y=nyield, color=factor(facet)), size=3, alpha=.75) 
+        }
+      }
+      
+      if(input$plottype2=="2"){
+        if(sum(is.na(plotdata$facet))>0){
+          plot <- plot + 
+            geom_line(data=spline.data, aes(x=jitterMG, y=fit.lwr), linetype=2) + 
+            geom_line(data=spline.data, aes(x=jitterMG, y=fit.upr), linetype=2)  + 
+            geom_line(data=spline.data, aes(x=jitterMG, y=fit.fit), size=2)
+        } else {
+          plot <- plot + 
+            geom_line(data=spline.data, aes(x=jitterMG, y=fit.lwr, colour=factor(facet)), linetype=2) + 
+            geom_line(data=spline.data, aes(x=jitterMG, y=fit.upr, colour=factor(facet)), linetype=2)  + 
+            geom_line(data=spline.data, aes(x=jitterMG, y=fit.fit, colour=factor(facet)), size=2, alpha=1/sqrt(nrow(spline.max))) +
+            scale_colour_brewer(gsub("PlantDay", "Planting\nDate", input$compare),palette="Set1") + 
+            geom_segment(data=spline.max, aes(x=MG, y=fit.fit, xend=MG, yend=0, colour=factor(facet), ymax=fit.fit), linetype=3, size=2)
+        }
+      } else {
+        if(sum(is.na(plotdata$facet))>0){
+          plot <- plot + 
+            geom_boxplot(data=plotdata, aes(x=MG, y=nyield, group=round_any(MG*2, 1)/2), fill=NA)
+        } else {
+          plot <- plot + 
+            geom_boxplot(data=plotdata, aes(x=MG, y=nyield, colour=factor(facet), 
+                                            group=interaction(factor(facet), round_any(MG*2, 1)/2)), 
+                         fill=NA, position=position_dodge()) + 
+            scale_colour_brewer(gsub("PlantDay", "Planting\nDate", input$compare),palette="Set1")
+          if(length(unique(plotdata$facet))>1)
+            plot <- plot + geom_vline(aes(xintercept=-1:5+.5), colour="grey30")
+        }
+      }
+      
+      plot <- plot + 
         scale_y_continuous(breaks=c(0, .25, .5, .75, 1), name="Relative Yield", limits=c(0, 1.1)) + 
         scale_x_continuous(breaks=0:5, labels=0:5, name="Maturity Group") + 
         theme_bw() + 
@@ -317,86 +316,117 @@ shinyServer(function(input, output, session) {
               legend.title = element_text(size = 16), 
               legend.text = element_text(size = 14), 
               axis.text = element_text(size = 14), 
-              axis.title = element_text(size = 16)) + 
+              axis.title = element_text(size = 16), 
+              legend.position="bottom",
+              legend.direction="horizontal") + 
         ggtitle(paste0("Relative Yield by Maturity Group"))
-    
-    print(plot)
-  })
-  
-  # Plot of Yield by Planting Date
-  output$YieldByPlantingPlot <- renderPlot({
-    plotdata <- filter(yield, 
-                       Location%in%input$location &
-                         MG%in%input$maturity)
-    plotdata$Location <- factor(plotdata$Location, levels=input$location, ordered=T)
-    if(input$compare!="PlantDay"){
-      plotdata$facet <- plotdata[,input$compare]
     } else {
-      plotdata$facet <- NA
-    }
-    
-    if(!input$failed){
-      plotdata <- filter(plotdata, Comment!="failure")
-    }
-    
-    plotdata$nyield <- plotdata$Yield/max(plotdata$Yield, na.rm=TRUE)
-    plotdata$jitterDate <- yday(plotdata$Planting2)
-    
-    spline.data <- plotdata %>% group_by(facet) %>% do({
-      set.seed(9852996)
-      bx5 <- cbind(I=1, ns(.$jitterDate, df=5)) 
-      cubicspline5 <- lm(data=., nyield~bx5-1)
-      tmp <- data.frame(jitterDate=.$jitterDate)
-      tmp <- cbind(tmp, suppressWarnings(predict(cubicspline5, se.fit=T, interval="prediction", level=.95)))
-      tmp
-    })
-
-    spline.max <- spline.data %>% group_by(facet) %>% do({
-      .[which.max(.$fit.fit),]
-    })
-
-    if(input$points){
-      plot <- ggplot() + 
-        geom_jitter(data=plotdata, aes(x=jitterDate, y=nyield), alpha=.25) 
-    } else {
-      plot <- ggplot()
-    }
-    
-    
-    if(input$newdata2){
-      newdata <- filter(plotdata, Year==2014)
-      if(nrow(newdata)>0){
-        plot <- plot + 
-          geom_point(data=newdata, aes(x=jitterDate, y=nyield, color=factor(facet)), size=3, alpha=.75) 
-      }
-    }
-    
-    if(sum(is.na(plotdata$facet))>0){
-      plot <- plot + 
-        geom_line(data=spline.data, aes(x=jitterDate, y=fit.lwr), linetype=2) + 
-        geom_line(data=spline.data, aes(x=jitterDate, y=fit.upr), linetype=2) + 
-        geom_line(data=spline.data, aes(x=jitterDate, y=fit.fit), size=2)
-    } else {
-      plot <- plot + 
-        geom_line(data=spline.data, aes(x=jitterDate, y=fit.lwr, colour=factor(facet)), linetype=2) + 
-        geom_line(data=spline.data, aes(x=jitterDate, y=fit.upr, colour=factor(facet)), linetype=2) + 
-        geom_line(data=spline.data, aes(x=jitterDate, y=fit.fit, colour=factor(facet)), size=2, alpha=1/sqrt(nrow(spline.max))) + 
-        scale_colour_brewer(gsub("PlantDay", "Planting\nDate", input$compare),palette="Set1") + 
-        geom_segment(data=spline.max, aes(x=jitterDate, y=fit.fit, xend=jitterDate, yend=0, colour=factor(facet)), linetype=3, size=2)
-    }
-    
-    plot <- plot + 
-        scale_y_continuous(breaks=c(0, .25, .5, .75, 1), name="Relative Yield", limits=c(0, 1.1)) + 
-        scale_x_continuous("", breaks=c(92, 122, 153, 183, 214, 245), 
-                           labels=c("Apr", "May", "Jun", "Jul", "Aug", "Sept")) + 
+      plot <- qplot(x=0, y=0, label="Waiting for input", geom="text") + 
         theme_bw() + 
         theme(plot.title = element_text(size = 18), 
               legend.title = element_text(size = 16), 
               legend.text = element_text(size = 14), 
               axis.text = element_text(size = 14), 
-              axis.title = element_text(size = 16)) + 
-        ggtitle(paste0("Relative Yield by Planting Date"))
+              axis.title = element_text(size = 16), 
+              legend.position="bottom",
+              legend.direction="horizontal") + 
+        ggtitle(paste0("Relative Yield by Maturity Group"))
+    }
     
     print(plot)
+#     plot <- qplot(x=0, y=0, label="test", geom="text")
+#     print(plot)
+  })
+  
+  # Plot of Yield by Planting Date
+  output$YieldByPlantingPlot <- renderPlot({
+    if(length(input$location)>0 & length(input$maturity)>0 & length(input$compare)>0){
+      plotdata <- filter(yield, 
+                         Location%in%input$location &
+                           MG%in%input$maturity)
+      plotdata$Location <- factor(plotdata$Location, levels=input$location, ordered=T)
+      if(input$compare!="PlantDay"){
+        plotdata$facet <- plotdata[,input$compare]
+      } else {
+        plotdata$facet <- NA
+      }
+      
+      if(!input$failed){
+        plotdata <- filter(plotdata, Comment!="failure")
+      }
+      
+      plotdata$nyield <- plotdata$Yield/max(plotdata$Yield, na.rm=TRUE)
+      plotdata$jitterDate <- yday(plotdata$Planting2)
+      
+      spline.data <- plotdata %>% group_by(facet) %>% do({
+        set.seed(9852996)
+        bx5 <- cbind(I=1, ns(.$jitterDate, df=5)) 
+        cubicspline5 <- lm(data=., nyield~bx5-1)
+        tmp <- data.frame(jitterDate=.$jitterDate)
+        tmp <- cbind(tmp, suppressWarnings(predict(cubicspline5, se.fit=T, interval="prediction", level=.95)))
+        tmp
+      })
+  
+      spline.max <- spline.data %>% group_by(facet) %>% do({
+        .[which.max(.$fit.fit),]
+      })
+  
+      if(input$points){
+        plot <- ggplot() + 
+          geom_jitter(data=plotdata, aes(x=jitterDate, y=nyield), alpha=.25) 
+      } else {
+        plot <- ggplot()
+      }
+      
+      
+      if(input$newdata2){
+        newdata <- filter(plotdata, Year==2014)
+        if(nrow(newdata)>0){
+          plot <- plot + 
+            geom_point(data=newdata, aes(x=jitterDate, y=nyield, color=factor(facet)), size=3, alpha=.75) 
+        }
+      }
+      
+      if(sum(is.na(plotdata$facet))>0){
+        plot <- plot + 
+          geom_line(data=spline.data, aes(x=jitterDate, y=fit.lwr), linetype=2) + 
+          geom_line(data=spline.data, aes(x=jitterDate, y=fit.upr), linetype=2) + 
+          geom_line(data=spline.data, aes(x=jitterDate, y=fit.fit), size=2)
+      } else {
+        plot <- plot + 
+          geom_line(data=spline.data, aes(x=jitterDate, y=fit.lwr, colour=factor(facet)), linetype=2) + 
+          geom_line(data=spline.data, aes(x=jitterDate, y=fit.upr, colour=factor(facet)), linetype=2) + 
+          geom_line(data=spline.data, aes(x=jitterDate, y=fit.fit, colour=factor(facet)), size=2, alpha=1/sqrt(nrow(spline.max))) + 
+          scale_colour_brewer(gsub("PlantDay", "Planting\nDate", input$compare),palette="Set1") + 
+          geom_segment(data=spline.max, aes(x=jitterDate, y=fit.fit, xend=jitterDate, yend=0, colour=factor(facet)), linetype=3, size=2)
+      }
+      
+      plot <- plot + 
+          scale_y_continuous(breaks=c(0, .25, .5, .75, 1), name="Relative Yield", limits=c(0, 1.1)) + 
+          scale_x_continuous("", breaks=c(92, 122, 153, 183, 214, 245), 
+                             labels=c("Apr", "May", "Jun", "Jul", "Aug", "Sept")) + 
+          theme_bw() + 
+        theme(plot.title = element_text(size = 18), 
+              legend.title = element_text(size = 16), 
+              legend.text = element_text(size = 14), 
+              axis.text = element_text(size = 14), 
+              axis.title = element_text(size = 16), 
+              legend.position="bottom",
+              legend.direction="horizontal") + 
+          ggtitle(paste0("Relative Yield by Planting Date"))
+    } else {
+      plot <- qplot(x=0, y=0, label="Waiting for input", geom="text") + 
+        theme_bw() + 
+        theme(plot.title = element_text(size = 18), 
+              legend.title = element_text(size = 16), 
+              legend.text = element_text(size = 14), 
+              axis.text = element_text(size = 14), 
+              axis.title = element_text(size = 16), 
+              legend.position="bottom",
+              legend.direction="horizontal") + 
+        ggtitle(paste0("Relative Yield by Maturity Group"))
+    }
+#     plot <- qplot(x=0, y=0, label="test", geom="text")
+#     print(plot)
   })
 })
