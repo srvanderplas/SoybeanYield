@@ -35,6 +35,7 @@ newdata$R1 <- dm(mdy(newdata$R1))
 newdata$R4 <- dm(mdy(newdata$R4))
 newdata$R7 <- dm(mdy(newdata$R7))
 newdata$R8 <- dm(mdy(newdata$R8))
+newdata$Comment <- ""
 
 yield <- rbind.fill(yield, newdata[,-which(names(newdata)%in%c("bushels", "moisture", "oldDate", "oldPlanting"))])
 
