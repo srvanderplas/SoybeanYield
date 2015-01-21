@@ -436,4 +436,23 @@ shinyServer(function(input, output, session) {
   output$YieldByPlantingPlot <- renderPlot({
     print(drawYieldByPlantingPlot())
   })
+  
+  output$documentDownload <- downloadHandler(
+    filename = "SoybeanYield.docx",
+    content = function(file) {
+      writeLines(      
+        knit(text = 
+'---
+title: "Soybean Yield"
+output: word_document
+---
+
+Variable | Selected Values 
+-------- | ---------------
+Location | `r paste(input$location, collapse=" ")`
+Maturity | `r paste(input$maturity, collapse=" ")`
+Plant Date | `r paste(input$planting, collapse=" ")`
+
+', output=NULL), file)
+    })
 })
