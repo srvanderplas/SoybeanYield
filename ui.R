@@ -73,7 +73,7 @@ tool <- function(){
 shinyUI(
   navbarPage(
     title="Soybean Phenology and Relative Yield",
-    tabPanel("Introduction", helpText("Page for photos, tool description (we are working on a detailed text), sponsors, disclaimer, name of the developers and version. I will provide all this info (next step).")),
+    tabPanel("Introduction", h3("Page for photos, tool description (we are working on a detailed text), sponsors, disclaimer, name of the developers and version.")),
     tool(),
     inverse=TRUE
 ))
