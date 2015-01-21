@@ -8,6 +8,7 @@ library(stringr)
 library(splines)
 
 load("Data/serverStart.rda")
+load("Data/uiStart.rda")
 
 fix.na.data <- function(df){
   ret <- unique(df[,c("Location", "PlantDay", "MG", "Stage")])
@@ -271,8 +272,13 @@ shinyServer(function(input, output, session) {
       if(input$newdata2){
         newdata <- filter(plotdata, Year==2014)
         if(nrow(newdata)>0){
-          plot <- plot + 
-            geom_point(data=newdata, aes(x=jitterMG, y=nyield, color=factor(facet)), size=3, alpha=.75) 
+          if(sum(is.na(plotdata$facet))>0){
+            plot <- plot + 
+              geom_point(data=newdata, aes(x=jitterMG, y=nyield), size=3, alpha=.75) 
+          } else {
+            plot <- plot + 
+              geom_point(data=newdata, aes(x=jitterMG, y=nyield, color=factor(facet)), size=3, alpha=.75) 
+          }
         }
       }
       
@@ -375,8 +381,14 @@ shinyServer(function(input, output, session) {
       if(input$newdata2){
         newdata <- filter(plotdata, Year==2014)
         if(nrow(newdata)>0){
-          plot <- plot + 
-            geom_point(data=newdata, aes(x=jitterDate, y=nyield, color=factor(facet)), size=3, alpha=.75) 
+          if(sum(is.na(plotdata$facet))>0){
+            plot <- plot + 
+              geom_point(data=newdata, aes(x=jitterDate, y=nyield), size=3, alpha=.75)
+          } else {
+            plot <- plot + 
+              geom_point(data=newdata, aes(x=jitterDate, y=nyield, color=factor(facet)), size=3, alpha=.75) 
+            
+          }
         }
       }
       
@@ -384,7 +396,8 @@ shinyServer(function(input, output, session) {
         plot <- plot + 
           geom_line(data=spline.data, aes(x=jitterDate, y=fit.lwr), linetype=2) + 
           geom_line(data=spline.data, aes(x=jitterDate, y=fit.upr), linetype=2) + 
-          geom_line(data=spline.data, aes(x=jitterDate, y=fit.fit), size=2)
+          geom_line(data=spline.data, aes(x=jitterDate, y=fit.fit), size=2) + 
+          geom_segment(data=spline.max, aes(x=jitterDate, y=fit.fit, xend=jitterDate, yend=0), size=2, linetype=4)
       } else {
         plot <- plot + 
           geom_line(data=spline.data, aes(x=jitterDate, y=fit.lwr, colour=factor(facet)), linetype=2) + 
