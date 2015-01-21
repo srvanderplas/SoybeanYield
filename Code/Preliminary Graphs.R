@@ -87,11 +87,11 @@ ggplot() +
 
 
 plotdata <- filter(yield, 
-                   Location%in%c("Ames", "Kanawha") &
+                   Location%in%c("Sutherland", "Ames", "Crawford") &
                    MG%in%c(0, 1, 2, 3, 4, 5))
 
 plotdata <- filter(plotdata, Comment!="failure")
-plotdata$Location <- factor(plotdata$Location, levels=c("Ames", "Kanawha"), ordered=T)
+plotdata$Location <- factor(plotdata$Location, levels=c("Sutherland", "Ames", "Crawford"), ordered=T)
 
 if(input$compare!="PlantDay"){
   plotdata$facet <- plotdata[,input$compare]
@@ -136,3 +136,53 @@ plot <- ggplot(data=plotdata) +
   ggtitle(paste0("Relative Yield by Planting Date"))
 
 print(plot)
+
+
+plotdata <- filter(yield, 
+                   Location%in%c("Sutherland", "Ames", "Crawford") &
+                   PlantDay%in%c("5-Apr", "15-Apr", "5-May", "15-May", "5-Jun", "15-Jun", "5-Jul", "15-Jul"))
+plotdata$Location <- factor(plotdata$Location, levels=c("Sutherland", "Ames", "Crawford"), ordered=T)
+plotdata <- filter(plotdata, Comment!="failure")
+plotdata <- plotdata %>% group_by(Location, PlantDay) %>% mutate(nyield=Yield/max(Yield)) %>% as.data.frame
+plotdata$jitterMG <- jitter(plotdata$MG, amount=.2)
+
+spline.data <- plotdata %>% group_by(Location, PlantDay) %>% do({
+  set.seed(9852996)
+  bx3 <- cbind(I=1, ns(.$jitterMG, df=3)) 
+  cubicspline3 <- lm(data=., nyield~bx3-1)
+  tmp <- data.frame(MG=.$MG, jitterMG=.$jitterMG)
+  tmp <- cbind(tmp, suppressWarnings(predict(cubicspline3, se.fit=T, interval="prediction", level=.95)))
+  tmp
+})
+
+spline.max <- spline.data %>% group_by(Location, PlantDay) %>% do({
+  .[which.max(.$fit.fit),]
+})
+
+if(nrow(spline.max)>1 & length(unique(spline.max$MG))<nrow(spline.max)){
+  spline.max$MG <- spline.max$MG + seq(-.05, .05, length.out = nrow(spline.max))
+}    
+
+plotdata$facet <- factor(plotdata$PlantDay, levels=c("5-Apr", "15-Apr", "5-May", "15-May", "5-Jun", "15-Jun", "5-Jul", "15-Jul"), ordered=T)
+spline.data$facet <- factor(spline.data$PlantDay, levels=c("5-Apr", "15-Apr", "5-May", "15-May", "5-Jun", "15-Jun", "5-Jul", "15-Jul"), ordered=T)
+spline.max$facet <- factor(spline.max$PlantDay, levels=c("5-Apr", "15-Apr", "5-May", "15-May", "5-Jun", "15-Jun", "5-Jul", "15-Jul"), ordered=T)
+
+plot <- ggplot(data=plotdata) + 
+  facet_grid(PlantDay ~ Location)  + 
+  geom_point(data=plotdata, aes(x=jitterMG, y=nyield), alpha=.25) + 
+  geom_line(data=spline.data, aes(x=jitterMG, y=fit.lwr, colour=factor(facet)), linetype=2) + 
+  geom_line(data=spline.data, aes(x=jitterMG, y=fit.upr, colour=factor(facet)), linetype=2)  + 
+  geom_line(data=spline.data, aes(x=jitterMG, y=fit.fit, colour=factor(facet)), size=2, alpha=1/sqrt(nrow(spline.max))) +
+  scale_colour_brewer("Planting\nDate", palette="Set1") + 
+  geom_segment(data=spline.max, aes(x=MG, y=fit.fit, xend=MG, yend=0, colour=factor(facet), ymax=fit.fit), linetype=1, size=2) + 
+  scale_y_continuous(breaks=c(0, .25, .5, .75, 1), name="Relative Yield", limits=c(0, 1.1)) + 
+  scale_x_continuous(breaks=0:5, labels=0:5, name="Maturity Group") + 
+  theme_bw() + 
+  theme(plot.title = element_text(size = 18), 
+        legend.title = element_text(size = 16), 
+        legend.text = element_text(size = 14), 
+        axis.text = element_text(size = 14), 
+        axis.title = element_text(size = 16), 
+        legend.position="bottom",
+        legend.direction="horizontal") + 
+  ggtitle(paste0("Relative Yield by Maturity Group"))
