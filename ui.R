@@ -31,8 +31,7 @@ shinyUI(fluidPage(
     column(10, 
       plotOutput("DevelopmentPlot", height=400),
       div(align="center", 
-          helpText("This plot shows the temporal distribution of each maturity stage by maturity group and planting date. 
-                    The boxes shown indicate the 25th, and 75th percentiles, with an additional line indicating the median.")
+          helpText(strong("Fig. 1"), "Development timeline of soybean cultivars.", br(), "About these plots:", a(href="https://en.wikipedia.org/wiki/Box_plot", "Box plot"), ", ", a(href="https://en.wikipedia.org/wiki/Violin_plot", "Violin plot"))
           )
       ),
     column(2, br(), br(), 
@@ -41,14 +40,12 @@ shinyUI(fluidPage(
              radioButtons("plottype", "Plot Type", choices=c("Box Plot" = 1, "Violin Plot" = 2), selected=1), 
              br(), 
              checkboxInput("facets", "Show Facets", value=FALSE),
-             br(),
-             checkboxInput("newdata", "Show 2014 measured data (if available)", value=FALSE),
-             br())
+             checkboxInput("newdata", "Show 2014 measured data (if available)", value=FALSE))
            )
     ),
   fluidRow(
     column(4, offset=1, 
-           plotOutput("YieldByMGPlot", height=300)), 
+           plotOutput("YieldByMGPlot", height=400)), 
     column(2, br(),br(),
            wellPanel(
              h4("Plot Options"),
@@ -62,14 +59,14 @@ shinyUI(fluidPage(
              br())
            ),
     column(4,
-           plotOutput("YieldByPlantingPlot", height=300))
+           plotOutput("YieldByPlantingPlot", height=400))
     ),
   fluidRow(
     column(6,
-           div(align="center", helpText("This plot shows the decline in (relative) yield with increasing maturity group, for a specified planting date."))
+           div(align="center", helpText(strong("Fig. 2"), "Relationship between relative yield and soybean cultivar for a specific planting date(s) and location(s). Vertical dotted line(s) indicates the appropriate maturity group for use in a specific location and/or planting date."))
            ),
     column(6,
-           div(align="center", helpText("This plot shows the decline in (relative) yield with later planting dates, for a specified maturity group."))
+           div(align="center", helpText(strong("Fig. 3"), "Relationship between relative yield and date of planting for a specific cultivar and location. Vertical dotted line(s) indicates the optimum planting date(s) for maximizing yield under a particular combination of cultivar and location."))
            )
     )
 ))
