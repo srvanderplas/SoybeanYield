@@ -20,6 +20,7 @@ fix.na.data <- function(df){
 }
 
 
+
 # enlarge font for session 
 theme_set(theme_bw(24))
 
@@ -89,10 +90,8 @@ shinyServer(function(input, output, session) {
                     choices=seq(0, 5.5, by=0.5), selected=2)
       }
     })
- 
-  # Plot of development progress
-  output$DevelopmentPlot <- renderPlot({
-    
+  
+  drawDevelopmentPlot <- reactive({
     longdata.sub <- filter(longyield, MG%in%input$maturity & 
                              Location%in%input$location & 
                              PlantDay%in%input$planting) 
@@ -120,14 +119,14 @@ shinyServer(function(input, output, session) {
       } else {
         plant.dates.df <- data.frame(x=plant.dates, y=.5, yend=1.5, facet=unique(input$planting))
       }
-#       
-#       quantile.sub <- longdata.sub %>% 
-#         group_by(Location, PlantDay, MG, Stage, facet) %>% 
-#         do(data.frame(q25=floor_date(quantile(.$Date, .25, na.rm=T), "day"), 
-#                       q50=floor_date(quantile(.$Date, .5, na.rm=T), "day"),
-#                       q75=floor_date(quantile(.$Date, .75, na.rm=T), "day")))
-#         
-         
+      #       
+      #       quantile.sub <- longdata.sub %>% 
+      #         group_by(Location, PlantDay, MG, Stage, facet) %>% 
+      #         do(data.frame(q25=floor_date(quantile(.$Date, .25, na.rm=T), "day"), 
+      #                       q50=floor_date(quantile(.$Date, .5, na.rm=T), "day"),
+      #                       q75=floor_date(quantile(.$Date, .75, na.rm=T), "day")))
+      #         
+      
       
       yield.sub <- filter(yield, MG%in%input$maturity & 
                             Location%in%input$location & 
@@ -145,11 +144,11 @@ shinyServer(function(input, output, session) {
       hour(frost.date.df$frost.date) <- sample(0:11, nrow(frost.date.df))
       
       frost.date.df$frost.date.lb <- floor_date(
-                                      quantile(
-                                        filter(yield, MG%in%input$maturity & 
-                                                 Location%in%input$location & 
-                                                 PlantDay%in%input$planting)$Date.of.first.frost2, 
-                                        .25, na.rm=T), "day")
+        quantile(
+          filter(yield, MG%in%input$maturity & 
+                   Location%in%input$location & 
+                   PlantDay%in%input$planting)$Date.of.first.frost2, 
+          .25, na.rm=T), "day")
       frost.date.df$frost.date.ub <- floor_date(quantile(filter(yield, MG%in%input$maturity & 
                                                                   Location%in%input$location & 
                                                                   PlantDay%in%input$planting)$Date.of.first.frost2, 
@@ -164,9 +163,9 @@ shinyServer(function(input, output, session) {
         plot <- ggplot() + 
           stat_boxplot(aes(x=Stage, y=Date, fill=factor(facet), color=factor(facet)), 
                        alpha=.3, shape=1, position=position_dodge(), data=longdata.sub, width=0.9)
-#         geom_crossbar(aes(x=Stage, y=q50, ymin=q25, ymax=q75, fill=factor(facet), 
-#                         color=factor(facet), width=0.9), 
-#                         alpha=.3, position=position_dodge(), data=quantile.sub) 
+        #         geom_crossbar(aes(x=Stage, y=q50, ymin=q25, ymax=q75, fill=factor(facet), 
+        #                         color=factor(facet), width=0.9), 
+        #                         alpha=.3, position=position_dodge(), data=quantile.sub) 
       } else {
         plot <- ggplot() + 
           geom_violin(aes(x=Stage, y=Date, fill=factor(facet), color=factor(facet)), 
@@ -224,11 +223,9 @@ shinyServer(function(input, output, session) {
                        data=frost.date.df, linetype=2, show_guide=F)
       }
     }
-    print(plot)
   })
-
-  # Plot of Yield by MG
-  output$YieldByMGPlot <- renderPlot({
+  
+  drawYieldByMGPlot <- reactive({
     if(length(input$location)>0 & length(input$planting)>0 & length(input$compare)>0){
       plotdata <- filter(yield, 
                          Location%in%input$location &
@@ -332,11 +329,10 @@ shinyServer(function(input, output, session) {
               legend.direction="horizontal") + 
         ggtitle(paste0("Relative Yield by Maturity Group"))
     }
-    print(plot)
+    plot
   })
   
-  # Plot of Yield by Planting Date
-  output$YieldByPlantingPlot <- renderPlot({
+  drawYieldByPlantingPlot <- reactive({
     if(length(input$location)>0 & length(input$maturity)>0 & length(input$compare)>0){
       plotdata <- filter(yield, 
                          Location%in%input$location &
@@ -363,11 +359,11 @@ shinyServer(function(input, output, session) {
         tmp <- cbind(tmp, suppressWarnings(predict(cubicspline5, se.fit=T, interval="prediction", level=.95)))
         tmp
       })
-  
+      
       spline.max <- spline.data %>% group_by(facet) %>% do({
         .[which.max(.$fit.fit),]
       })
-  
+      
       if(input$points){
         plot <- ggplot() + 
           geom_jitter(data=plotdata, aes(x=jitterDate, y=nyield), alpha=.25) 
@@ -399,10 +395,10 @@ shinyServer(function(input, output, session) {
       }
       
       plot <- plot + 
-          scale_y_continuous(breaks=c(0, .25, .5, .75, 1), name="Relative Yield", limits=c(0, 1.1)) + 
-          scale_x_continuous("", breaks=c(92, 122, 153, 183, 214, 245), 
-                             labels=c("Apr", "May", "Jun", "Jul", "Aug", "Sept")) + 
-          theme_bw() + 
+        scale_y_continuous(breaks=c(0, .25, .5, .75, 1), name="Relative Yield", limits=c(0, 1.1)) + 
+        scale_x_continuous("", breaks=c(92, 122, 153, 183, 214, 245), 
+                           labels=c("Apr", "May", "Jun", "Jul", "Aug", "Sept")) + 
+        theme_bw() + 
         theme(plot.title = element_text(size = 18), 
               legend.title = element_text(size = 16), 
               legend.text = element_text(size = 14), 
@@ -410,7 +406,7 @@ shinyServer(function(input, output, session) {
               axis.title = element_text(size = 16), 
               legend.position="bottom",
               legend.direction="horizontal") + 
-          ggtitle(paste0("Relative Yield by Planting Date"))
+        ggtitle(paste0("Relative Yield by Planting Date"))
     } else {
       plot <- qplot(x=0, y=0, label="Waiting for input", geom="text") + 
         theme_bw() + 
@@ -423,6 +419,21 @@ shinyServer(function(input, output, session) {
               legend.direction="horizontal") + 
         ggtitle(paste0("Relative Yield by Maturity Group"))
     }
-    print(plot)
+    plot
+  })
+  
+  # Plot of development progress
+  output$DevelopmentPlot <- renderPlot({
+    print(drawDevelopmentPlot())
+  })
+
+  # Plot of Yield by MG
+  output$YieldByMGPlot <- renderPlot({
+    print(drawYieldByMGPlot())
+  })
+  
+  # Plot of Yield by Planting Date
+  output$YieldByPlantingPlot <- renderPlot({
+    print(drawYieldByPlantingPlot())
   })
 })
