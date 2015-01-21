@@ -291,7 +291,7 @@ shinyServer(function(input, output, session) {
             geom_line(data=spline.data, aes(x=jitterMG, y=fit.upr, colour=factor(facet)), linetype=2)  + 
             geom_line(data=spline.data, aes(x=jitterMG, y=fit.fit, colour=factor(facet)), size=2, alpha=1/sqrt(nrow(spline.max))) +
             scale_colour_brewer(gsub("PlantDay", "Planting\nDate", input$compare),palette="Set1") + 
-            geom_segment(data=spline.max, aes(x=MG, y=fit.fit, xend=MG, yend=0, colour=factor(facet), ymax=fit.fit), linetype=3, size=2)
+            geom_segment(data=spline.max, aes(x=MG, y=fit.fit, xend=MG, yend=0, colour=factor(facet), ymax=fit.fit), linetype=4, size=2)
         }
       } else {
         if(sum(is.na(plotdata$facet))>0){
@@ -395,7 +395,7 @@ shinyServer(function(input, output, session) {
           geom_line(data=spline.data, aes(x=jitterDate, y=fit.upr, colour=factor(facet)), linetype=2) + 
           geom_line(data=spline.data, aes(x=jitterDate, y=fit.fit, colour=factor(facet)), size=2, alpha=1/sqrt(nrow(spline.max))) + 
           scale_colour_brewer(gsub("PlantDay", "Planting\nDate", input$compare),palette="Set1") + 
-          geom_segment(data=spline.max, aes(x=jitterDate, y=fit.fit, xend=jitterDate, yend=0, colour=factor(facet)), linetype=3, size=2)
+          geom_segment(data=spline.max, aes(x=jitterDate, y=fit.fit, xend=jitterDate, yend=0, colour=factor(facet)), linetype=4, size=2)
       }
       
       plot <- plot + 
