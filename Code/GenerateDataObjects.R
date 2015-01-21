@@ -14,6 +14,8 @@ yield$PlantDay <- factor(yield$PlantDay, levels=unique(yield$PlantDay)[order(ydm
 yield$Date.of.first.frost2 <- dmy(paste0(yield$Date.of.first.frost, "-2000"))
 yield$MG <- as.character(gsub("MG", "", yield$MG))
 yield$MG <- (nchar(yield$MG)==1)*as.numeric(yield$MG) + (nchar(yield$MG)==2)*(as.numeric(yield$MG)/10)
+yield$oldYield <- yield$Yield
+yield$Yield[yield$Location=="Missouri"] <- yield$pot.Yield[yield$Location=="Missouri"]
 
 dm <- function(x){
   sprintf("%i-%s", mday(x), as.character(month(x, label=T, abbr=T)))
