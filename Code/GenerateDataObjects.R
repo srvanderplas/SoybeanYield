@@ -14,6 +14,8 @@ yield$PlantDay <- factor(yield$PlantDay, levels=unique(yield$PlantDay)[order(ydm
 yield$Date.of.first.frost2 <- dmy(paste0(yield$Date.of.first.frost, "-2000"))
 yield$MG <- as.character(gsub("MG", "", yield$MG))
 yield$MG <- (nchar(yield$MG)==1)*as.numeric(yield$MG) + (nchar(yield$MG)==2)*(as.numeric(yield$MG)/10)
+yield$oldYield <- yield$Yield
+yield$Yield[yield$Location=="Missouri"] <- yield$pot.Yield[yield$Location=="Missouri"]
 
 dm <- function(x){
   sprintf("%i-%s", mday(x), as.character(month(x, label=T, abbr=T)))
@@ -41,6 +43,9 @@ newdata$Comment[is.na(newdata$Yield)] <- "failed"
 newdata$Yield[is.na(newdata$Yield)] <- 0
 
 yield <- rbind.fill(yield, newdata[,-which(names(newdata)%in%c("bushels", "moisture", "oldDate", "oldPlanting"))])
+
+yield$Location <- gsub("^Crawford ?$", "Crawfordsville", yield$Location)
+yield$Location <- gsub("(.*) $", "\\1", yield$Location)
 
 longyield <- melt(yield, id.vars=c(1,2,3,5,18:21), measure.vars=c(4,7:11), variable.name="Stage", value.name="Date")
 longyield$Date <- paste0(longyield$Date, "-2000")

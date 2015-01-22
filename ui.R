@@ -38,9 +38,8 @@ tool <- function(){
              wellPanel(
                h4("Plot Options"),
                radioButtons("plottype", "Plot Type", choices=c("Box Plot" = 1, "Violin Plot" = 2), selected=1), 
-               br(), 
-               checkboxInput("facets", "Show Facets", value=FALSE),
-               checkboxInput("newdata", "Show 2014 measured data (if available)", value=FALSE))
+               checkboxInput("facets", "Show sub-plots", value=FALSE)
+             )
       )
     ),
     fluidRow(
@@ -49,15 +48,14 @@ tool <- function(){
              div(align="center", helpText(strong("Fig. 2"), "Relationship between relative yield and soybean cultivar for a specific planting date(s) and location(s). Vertical dotted line(s) indicates the appropriate maturity group for use in a specific location and/or planting date."))), 
       column(2, br(),br(),
              wellPanel(
-               strong("Plot Options"),
-               h5("Relative Yield by MG Plot:"),
+               strong("Relative Yield by MG Plot:"),
                radioButtons("plottype2", "Type", choices=c("Fitted Line"=2, "Box Plot" = 1), selected=2),
                br(),
                strong("Both Plots:"),
                checkboxInput("points", label="Show Points"),
                checkboxInput("failed", label="Include Failed Trials?"),
-               checkboxInput("newdata2", "Show 2014 measured data (if available)", value=FALSE),
-               br())
+               checkboxInput("newdata2", "Show 2014 measured data (if available)", value=FALSE)
+             )
       ),
       column(5,
              plotOutput("YieldByPlantingPlot", height=400),
