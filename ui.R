@@ -53,6 +53,7 @@ tool <- function(){
                br(),
                strong("Both Plots:"),
                checkboxInput("points", label="Show Points"),
+               checkboxInput("ci", label="Show 95% Prediction Interval"),
                checkboxInput("failed", label="Include Failed Trials?"),
                checkboxInput("newdata2", "Show 2014 measured data (if available)", value=FALSE)
              )
