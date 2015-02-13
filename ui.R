@@ -2,8 +2,6 @@ library(shiny)
 load("Data/uiStart.rda")
 
 tool <- function(){
-  #   # Application title
-  #   titlePanel("Soybean Phenology and Relative Yield"),
   tabPanel(
     "Tool", 
     tags$style(type="text/css", "label {font-size: 14px;}"),
@@ -72,7 +70,7 @@ tool <- function(){
 # Define UI for application that plots random distributions
 shinyUI(
   navbarPage(
-    title="Soybean Phenology and Relative Yield",
+    title="Soybean Planting Decision Tool”,
     tabPanel("Introduction", h3("Page for photos, tool description (we are working on a detailed text), sponsors, disclaimer, name of the developers and version.")),
     tool(),
     inverse=TRUE
