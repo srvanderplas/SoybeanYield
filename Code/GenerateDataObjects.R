@@ -44,6 +44,9 @@ newdata$Yield[is.na(newdata$Yield)] <- 0
 
 yield <- rbind.fill(yield, newdata[,-which(names(newdata)%in%c("bushels", "moisture", "oldDate", "oldPlanting"))])
 
+yield$Location <- gsub("^Crawford ?$", "Crawfordsville", yield$Location)
+yield$Location <- gsub("(.*) $", "\\1", yield$Location)
+
 fix.locations <- function(x){
   x %>% 
   str_replace(pattern="Sutherland", replacement="Northwest Iowa") %>%

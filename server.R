@@ -54,7 +54,7 @@ shinyServer(function(input, output, session) {
     if(input$compare=="PlantDay"){
       # If PlantDay is chosen to compare, output a selectizeInput list
       selectizeInput("planting", label="Select planting date(s)", 
-                     choices=planting.date, selected="15-May", 
+                     choices=planting.date, selected="5-May", 
                      multiple=TRUE, options=list(maxItems=3))
     } else {
       # If PlantDay is not chosen, but was previously chosen, 
@@ -65,9 +65,9 @@ shinyServer(function(input, output, session) {
                     choices=planting.date, selected=isolate(input$planting[1]))
       } else {
         # If location is not chosen and has never been specified, 
-        # use 15-May as the default value
+        # use 5-May as the default value
         selectInput("planting", label="Select planting date(s)", 
-                    choices=planting.date, selected="15-May")
+                    choices=planting.date, selected="5-May")
       }
     })
   
@@ -75,7 +75,7 @@ shinyServer(function(input, output, session) {
     if(input$compare=="MG"){
       # If MG is chosen to compare, output a selectizeInput list
       selectizeInput("maturity", label="Select maturity group(s)", 
-                     choices=seq(0, 5.5, by=0.5), selected=2, 
+                     choices=seq(0, 5.5, by=0.5), selected=2.5, 
                      multiple=TRUE, options=list(maxItems=3))
     } else {      
       # If MG is not chosen, but was previously chosen, 
@@ -86,9 +86,9 @@ shinyServer(function(input, output, session) {
                     choices=seq(0, 5.5, by=0.5), selected=isolate(input$maturity[1]))
       } else {
         # If location is not chosen and has never been specified, 
-        # use MG=2 as the default value
+        # use MG=2.5 as the default value
         selectInput("maturity", label="Select maturity group(s)", 
-                    choices=seq(0, 5.5, by=0.5), selected=2)
+                    choices=seq(0, 5.5, by=0.5), selected=2.5)
       }
     })
   
@@ -150,23 +150,23 @@ shinyServer(function(input, output, session) {
                    Location%in%input$location & 
                    PlantDay%in%input$planting)$Date.of.first.frost2, 
           .25, na.rm=T), "day")
-      frost.date.df$frost.date.ub <- floor_date(quantile(filter(yield, MG%in%input$maturity & 
-                                                                  Location%in%input$location & 
-                                                                  PlantDay%in%input$planting)$Date.of.first.frost2, 
-                                                         .75, na.rm=T), "day")
-      frost.date.df$med.frost <- floor_date(quantile(filter(yield, MG%in%input$maturity & 
-                                                              Location%in%input$location & 
-                                                              PlantDay%in%input$planting)$Date.of.first.frost2, 
-                                                     .5, na.rm=T), "day")
-      frost.date.df$textlabel <- floor_date(median(frost.date.df$frost.date), "day")
+      frost.date.df$frost.date.ub <- 
+        floor_date(quantile(filter(yield, MG%in%input$maturity & 
+                                     Location%in%input$location & 
+                                     PlantDay%in%input$planting)$Date.of.first.frost2, 
+                            .75, na.rm=T), "day")
+      frost.date.df$med.frost <- 
+        floor_date(quantile(filter(yield, MG%in%input$maturity & 
+                                     Location%in%input$location & 
+                                     PlantDay%in%input$planting)$Date.of.first.frost2, 
+                            .5, na.rm=T), "day")
+      frost.date.df$textlabel <- 
+        floor_date(median(frost.date.df$frost.date), "day")
       
       if(input$plottype=="1"){
         plot <- ggplot() + 
           stat_boxplot(aes(x=Stage, y=Date, fill=factor(facet), color=factor(facet)), 
                        alpha=.3, shape=1, position=position_dodge(), data=longdata.sub, width=0.9)
-        #         geom_crossbar(aes(x=Stage, y=q50, ymin=q25, ymax=q75, fill=factor(facet), 
-        #                         color=factor(facet), width=0.9), 
-        #                         alpha=.3, position=position_dodge(), data=quantile.sub) 
       } else {
         plot <- ggplot() + 
           geom_violin(aes(x=Stage, y=Date, fill=factor(facet), color=factor(facet)), 
@@ -181,19 +181,19 @@ shinyServer(function(input, output, session) {
         plot <- plot + facet_grid(.~facet, labeller=labeller(facet=label_facet))
       }
       
-      if(input$newdata){
-        newdata <- subset(longdata.sub, Year==2014)
-        if(nrow(newdata)>0){
-          tmp <- newdata
-          flevels <- seq(-.4, .4, length.out=length(unique(tmp$facet))+1)
-          fjitter <- runif(nrow(tmp), 
-                           (flevels[1:length(unique(tmp$facet))])[as.numeric(droplevels(tmp$facet))],
-                           (flevels[(1:length(unique(tmp$facet)))+1])[as.numeric(droplevels(tmp$facet))])  
-          tmp$Stage <- as.numeric(tmp$Stage) + fjitter
-          plot <- plot + geom_point(aes(x=Stage, y=Date, color=factor(facet)),
-                                    size=3, data=tmp, show_guide=F)
-        }
-      }
+#       if(input$newdata){
+#         newdata <- subset(longdata.sub, Year==2014)
+#         if(nrow(newdata)>0){
+#           tmp <- newdata
+#           flevels <- seq(-.4, .4, length.out=length(unique(tmp$facet))+1)
+#           fjitter <- runif(nrow(tmp), 
+#                            (flevels[1:length(unique(tmp$facet))])[as.numeric(droplevels(tmp$facet))],
+#                            (flevels[(1:length(unique(tmp$facet)))+1])[as.numeric(droplevels(tmp$facet))])  
+#           tmp$Stage <- as.numeric(tmp$Stage) + fjitter
+#           plot <- plot + geom_point(aes(x=Stage, y=Date, color=factor(facet)),
+#                                     size=3, data=tmp, show_guide=F)
+#         }
+#       }
       
       plot <- plot + 
         geom_text(aes(x=Stage, y=ymax, ymax=ymax, label=text, color=factor(facet)), 
@@ -242,7 +242,7 @@ shinyServer(function(input, output, session) {
         plotdata <- filter(plotdata, Comment!="failure")
       }
       
-      plotdata <- plotdata %>% group_by(facet) %>% mutate(nyield=Yield/max(Yield)) %>% as.data.frame
+      plotdata <- plotdata %>% group_by(facet) %>% mutate(nyield=100*Yield/max(Yield)) %>% as.data.frame
       plotdata$jitterMG <- jitter(plotdata$MG, amount=.2)
       
       spline.data <- plotdata %>% group_by(facet) %>% do({
@@ -285,16 +285,28 @@ shinyServer(function(input, output, session) {
       if(input$plottype2=="2"){
         if(sum(is.na(plotdata$facet))>0){
           plot <- plot + 
-            geom_line(data=spline.data, aes(x=jitterMG, y=fit.lwr), linetype=2) + 
-            geom_line(data=spline.data, aes(x=jitterMG, y=fit.upr), linetype=2)  + 
             geom_line(data=spline.data, aes(x=jitterMG, y=fit.fit), size=2)
+          if(input$ci){
+            plot <- plot  + 
+              geom_line(data=spline.data, aes(x=jitterMG, y=fit.lwr), 
+                        linetype=2) + 
+              geom_line(data=spline.data, aes(x=jitterMG, y=fit.upr), 
+                        linetype=2) 
+          }
         } else {
           plot <- plot + 
-            geom_line(data=spline.data, aes(x=jitterMG, y=fit.lwr, colour=factor(facet)), linetype=2) + 
-            geom_line(data=spline.data, aes(x=jitterMG, y=fit.upr, colour=factor(facet)), linetype=2)  + 
             geom_line(data=spline.data, aes(x=jitterMG, y=fit.fit, colour=factor(facet)), size=2, alpha=1/sqrt(nrow(spline.max))) +
             scale_colour_brewer(gsub("PlantDay", "Planting\nDate", input$compare),palette="Set1") + 
             geom_segment(data=spline.max, aes(x=MG, y=fit.fit, xend=MG, yend=0, colour=factor(facet), ymax=fit.fit), linetype=4, size=2)
+          if(input$ci){
+            plot <- plot + 
+              geom_line(data=spline.data, 
+                        aes(x=jitterMG, y=fit.lwr, colour=factor(facet)),
+                        linetype=2) + 
+              geom_line(data=spline.data, 
+                        aes(x=jitterMG, y=fit.upr, colour=factor(facet)),
+                        linetype=2)  
+          }
         }
       } else {
         if(sum(is.na(plotdata$facet))>0){
@@ -312,7 +324,7 @@ shinyServer(function(input, output, session) {
       }
       
       plot <- plot + 
-        scale_y_continuous(breaks=c(0, .25, .5, .75, 1), name="Relative Yield", limits=c(0, 1.1)) + 
+        scale_y_continuous(breaks=c(0, 25, 50, 75, 100), name="Relative Yield (%)", limits=c(0, 110)) + 
         scale_x_continuous(breaks=0:5, labels=0:5, name="Maturity Group") + 
         theme_bw() + 
         theme(plot.title = element_text(size = 18), 
@@ -354,7 +366,7 @@ shinyServer(function(input, output, session) {
         plotdata <- filter(plotdata, Comment!="failure")
       }
       
-      plotdata$nyield <- plotdata$Yield/max(plotdata$Yield, na.rm=TRUE)
+      plotdata$nyield <- 100*plotdata$Yield/max(plotdata$Yield, na.rm=TRUE)
       plotdata$jitterDate <- yday(plotdata$Planting2)
       
       spline.data <- plotdata %>% group_by(facet) %>% do({
@@ -394,21 +406,33 @@ shinyServer(function(input, output, session) {
       
       if(sum(is.na(plotdata$facet))>0){
         plot <- plot + 
-          geom_line(data=spline.data, aes(x=jitterDate, y=fit.lwr), linetype=2) + 
-          geom_line(data=spline.data, aes(x=jitterDate, y=fit.upr), linetype=2) + 
           geom_line(data=spline.data, aes(x=jitterDate, y=fit.fit), size=2) + 
           geom_segment(data=spline.max, aes(x=jitterDate, y=fit.fit, xend=jitterDate, yend=0), size=2, linetype=4)
+        if(input$ci){
+          plot <- plot + 
+            geom_line(data=spline.data, aes(x=jitterDate, y=fit.lwr), 
+                      linetype=2) + 
+            geom_line(data=spline.data, aes(x=jitterDate, y=fit.upr), 
+                      linetype=2)
+        }
       } else {
         plot <- plot + 
-          geom_line(data=spline.data, aes(x=jitterDate, y=fit.lwr, colour=factor(facet)), linetype=2) + 
-          geom_line(data=spline.data, aes(x=jitterDate, y=fit.upr, colour=factor(facet)), linetype=2) + 
           geom_line(data=spline.data, aes(x=jitterDate, y=fit.fit, colour=factor(facet)), size=2, alpha=1/sqrt(nrow(spline.max))) + 
           scale_colour_brewer(gsub("PlantDay", "Planting\nDate", input$compare),palette="Set1") + 
           geom_segment(data=spline.max, aes(x=jitterDate, y=fit.fit, xend=jitterDate, yend=0, colour=factor(facet)), linetype=4, size=2)
+        if(input$ci){
+          plot <- plot + 
+            geom_line(data=spline.data, 
+                      aes(x=jitterDate, y=fit.lwr, colour=factor(facet)),
+                      linetype=2) + 
+            geom_line(data=spline.data, 
+                      aes(x=jitterDate, y=fit.upr, colour=factor(facet)),
+                      linetype=2)
+        }
       }
       
       plot <- plot + 
-        scale_y_continuous(breaks=c(0, .25, .5, .75, 1), name="Relative Yield", limits=c(0, 1.1)) + 
+        scale_y_continuous(breaks=c(0, 25, 50, 75, 100), name="Relative Yield (%)", limits=c(0, 110)) + 
         scale_x_continuous("", breaks=c(92, 122, 153, 183, 214, 245), 
                            labels=c("Apr", "May", "Jun", "Jul", "Aug", "Sept")) + 
         theme_bw() + 
