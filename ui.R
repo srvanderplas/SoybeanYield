@@ -73,8 +73,10 @@ shinyUI(
     title="Soybean Planting Decision Tool",
     tabPanel("Introduction", 
              column(width=3, 
-                    img(src="Figures/Photo III SoybeanEmergen.png", width='100%', height='auto'),
-                    img(src="Figures/photo I.png", width='100%', height='auto')),
+                    img(src="PhotoIIISoybeanemergen.png", width='100%', height='auto'),
+                    br(),
+                    br(),
+                    img(src="PhotoI.png", width='100%', height='auto')),
              column(width=9,
                     div(class="panel-group", id="accordion", role="tablist", "aria-multiselectable"="true",
                         HTML(paste0(list.of.panels, collapse="\n"))
