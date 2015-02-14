@@ -61,7 +61,8 @@ tool <- function(){
       column(5,
              plotOutput("YieldByPlantingPlot", height=400),
              div(align="center", helpText(strong("Fig. 3"), "Relationship between relative yield and date of planting for a specific cultivar and location. Vertical dotted line(s) indicates the optimum planting date(s) for maximizing yield under a particular combination of cultivar and location.")))
-    )
+    ),
+    img(src="PhotoIISoybeanExperiment.png", width='100%', height='auto')
   )
 }
 
@@ -74,11 +75,6 @@ shinyUI(
     title="Soybean Planting Decision Tool", 
     position="fixed-top",
     tabPanel("Introduction", 
-             column(width=9,
-                    div(class="panel-group", id="accordion", role="tablist", "aria-multiselectable"="true",
-                        HTML(paste0(list.of.panels, collapse="\n"))
-                        )
-                    )
              br(), br(),
              div(align="center", h1("Understanding interactions between soybean planting date and maturity across environments"), br()),
              fluidRow(
@@ -93,6 +89,13 @@ shinyUI(
                           HTML(paste0(list.of.panels[16:19], collapse="\n"))
                       )
                ),
+               column(width=9,
+                      div(class="panel-group", id="accordion", role="tablist", "aria-multiselectable"="true",
+                              HTML(paste0(list.of.panels[1:15], collapse="\n")) 
+                      )
+               )
+             ),
+             img(src="PhotoIISoybeanExperiment.png", width='100%', height='auto')
              ),
     tool(),
     inverse=TRUE
