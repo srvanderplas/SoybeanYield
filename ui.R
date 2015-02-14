@@ -6,6 +6,7 @@ tool <- function(){
   tabPanel(
     "Tool", 
     tags$style(type="text/css", "label {font-size: 14px;}"),
+    br(), br(), 
     wellPanel(
       fluidRow(
         column(4, 
