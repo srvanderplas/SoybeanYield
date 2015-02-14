@@ -5,8 +5,8 @@
 
 <div align="center"><img src="Fig.3.TempXPhotoperiod.png" width='50%' height='auto'></div>
 <div align="center"><img src="Fig.4.YieldByMaturity.png" width='50%' height='auto'></div>
-<div align="center"><img src="Fig.5.YieldByDate.png" width='50%' height='auto'></div>
 
+<div align="center"><img src="Fig.5.YieldByDate.png" width='50%' height='auto'></div>
 
 <div align="center"><img src="Fig.6.MaximumYields.png" width='50%' height='auto'></div>
 <div align="center"><img src="Fig.7.YieldGap.png" width='50%' height='auto'></div>
