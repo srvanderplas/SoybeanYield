@@ -33,7 +33,7 @@ shinyServer(function(input, output, session) {
     if(input$compare=="Location"){
       # If location is chosen to compare, output a selectizeInput list
       selectizeInput("location", label="Select location(s)", 
-                     choices=locations, selected="Ames", 
+                     choices=locations, selected="Central Iowa", 
                      multiple=TRUE, options=list(maxItems=3))
     } else {
       # If location is not chosen, but was previously chosen, 
@@ -46,7 +46,7 @@ shinyServer(function(input, output, session) {
       # If location is not chosen and has never been specified, 
       # use Ames as the default value
         selectInput("location", label="Select location(s)", 
-                    choices=locations, selected="Ames")
+                    choices=locations, selected="Central Iowa")
       }
     })
   

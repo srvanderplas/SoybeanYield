@@ -7,7 +7,6 @@
 <b>Figure 4.</b> Relative yield response to maturity group selection for three locations and two planting dates (top = May 5th, bottom = June 5th). The vertical dotted lines indicate the most appropriate maturity group for each location and planting date.   
 <b>Figure 5.</b> Relative yield response to planting date for two locations (top = Ames, bottom = Sutherland). The vertical dotted red lines indicate the optimum planting date for each location with a 2.5 maturity group selection. The non-linear regression curve (thick, red line) is a statistical fit of the simulated data (grey points). The red points represent 2014 field data.   
 
-
 <b>Figure 6.</b> Simulated maximum actual and potential yields found across planting dates and maturity groups for 11 locations in Iowa, Minnesota and Missouri.
 <b>Figure 7.</b> Simulated average actual and potential yields in Ames, Iowa from 1980 to 2013 at four planting dates and 12 maturity groups. The difference between potential and actual yield is the yield gap. 
 <b>Figure 8.</b> Number of days with air temperature below 50&deg;F over the 30 days following planting (left) and simulated days from planting to emergence (right) at five regions. Each point is an average value across 34 years of data (1980–2013).  

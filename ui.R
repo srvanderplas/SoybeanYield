@@ -8,7 +8,7 @@ tool <- function(){
     tags$style(type="text/css", "label {font-size: 14px;}"),
     tags$head(tags$link(href="bootstrap.min.css", rel="stylesheet")),
     br(), br(), 
-    wellPanel(
+    wellPanel( 
       fluidRow(
         column(4, 
                br(),
