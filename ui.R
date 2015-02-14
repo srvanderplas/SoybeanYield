@@ -70,7 +70,8 @@ tool <- function(){
 # Define UI for application that plots random distributions
 shinyUI(
   navbarPage(
-    title="Soybean Planting Decision Tool",
+    title="Soybean Planting Decision Tool", 
+    position="fixed-top",
     tabPanel("Introduction", 
              column(width=3, 
                     img(src="PhotoIIISoybeanemergen.png", width='100%', height='auto'),
