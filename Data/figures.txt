@@ -1,18 +1,18 @@
-<img src="Figure/fig. 1. map with tool coverage.png" width='80%' height='auto'>
+<img src="Fig.1.MapWithToolCoverage.png" width='80%' height='auto'>
 <div align='center'><table><tr><th colspan=4>Table 1: Measured soybean data from Iowa that are included in the decision tool</th></tr><tr><td>Region</td><td>Site</td><td>Planting date</td><td>Maturity group</td></tr><tr><td>Northeast</td><td>Nashua</td><td>May 5, May 20, June 10, June 30</td><td>2.0, 2.5 </td></tr><tr><td>North Central</td><td>Kanawha</td><td>May 5, May 20, June 10, July 10</td><td>2.0, 2.5</td></tr> <tr><td>Northwest</td><td>Sutherland</td><td>May 5, May 20, June 10, July 5</td><td>2.0, 2.5 </td></tr> <tr><td>Central</td><td>Ames</td><td>May 5, May 20, June 10, July 10</td><td>2.0, 2.5, 3.5</td></tr> <tr><td>Southeast</td><td>Crawfordsville</td><td>May 5, May 20, June 10, June 25</td><td>2.5, 3.5, 4.0</td></tr> <tr><td>South Central</td><td>Chariton</td><td>May 5, May 20, June 10, June 25</td><td>2.5, 3.5, 4.0</td></tr> <tr><td>Southwest</td><td>Lewis</td><td>May 5, May 20, June 5, July 5</td><td>2.5, 3.5, 4.0</td></tr></table></div>
 
-<img src="Figure/fig. 2. phenology versus 3 days for 2.5 Ames.png" width='80%' height='auto'>
+<img src="Fig.2.PhenologyVersus3DaysFor2.5Ames.png" width='80%' height='auto'>
 
-<img src="Figure/fig. 3. temp x photoperiod.png" width='50%' height='auto'>
-<img src="Figure/fig. 4. yield by maturity.png" width='80%' height='auto'>
-<img src="fig. 5. yield by date.png" width='80%' height='auto'>
+<img src="Fig.3.TempXPhotoperiod.png" width='50%' height='auto'>
+<img src="Fig.4.YieldByMaturity.png" width='80%' height='auto'>
+<img src="Fig.5.YieldByDate.png" width='80%' height='auto'>
 
 
-<img src="fig. 6. maximum yields.png" width='80%' height='auto'>
-<img src="fig. 7. yield gap.png" width='80%' height='auto'>
-<img src="fig. 8. emergence.png" width='80%' height='auto'>
-<img src="fig. 9. frost.png" width='80%' height='auto'>
-<img src="fig. 10. crop failures.png" width='50%' height='auto'>
+<img src="Fig.6.MaximumYields.png" width='80%' height='auto'>
+<img src="Fig.7.YieldGap.png" width='80%' height='auto'>
+<img src="Fig.8.Emergence.png" width='80%' height='auto'>
+<img src="Fig.9.Frost.png" width='80%' height='auto'>
+<img src="Fig.10.CropFailures.png" width='50%' height='auto'>
 
 
 
