@@ -1,5 +1,6 @@
 library(shiny)
 load("Data/uiStart.rda")
+source("Code/Intro.R")
 
 tool <- function(){
   tabPanel(
@@ -69,8 +70,17 @@ tool <- function(){
 # Define UI for application that plots random distributions
 shinyUI(
   navbarPage(
-    title="Soybean Planting Decision Tool”,
-    tabPanel("Introduction", h3("Page for photos, tool description (we are working on a detailed text), sponsors, disclaimer, name of the developers and version.")),
+    title="Soybean Planting Decision Tool",
+    tabPanel("Introduction", 
+             column(width=3, 
+                    img(src="Figures/Photo III SoybeanEmergen.png", width='100%', height='auto'),
+                    img(src="Figures/photo I.png", width='100%', height='auto')),
+             column(width=9,
+                    div(class="panel-group", id="accordion", role="tablist", "aria-multiselectable"="true",
+                        HTML(paste0(list.of.panels, collapse="\n"))
+                        )
+                    )
+             ),
     tool(),
     inverse=TRUE
 ))
