@@ -73,16 +73,25 @@ shinyUI(
     title="Soybean Planting Decision Tool", 
     position="fixed-top",
     tabPanel("Introduction", 
-             column(width=3, 
-                    img(src="PhotoIIISoybeanemergen.png", width='100%', height='auto'),
-                    br(),
-                    br(),
-                    img(src="PhotoI.png", width='100%', height='auto')),
              column(width=9,
                     div(class="panel-group", id="accordion", role="tablist", "aria-multiselectable"="true",
                         HTML(paste0(list.of.panels, collapse="\n"))
                         )
                     )
+             br(), br(),
+             div(align="center", h1("Understanding interactions between soybean planting date and maturity across environments"), br()),
+             fluidRow(
+               column(width=3, 
+                      img(src="PhotoIIISoybeanemergen.png", width='100%', height='auto'),
+                      br(),
+                      br(),
+                      img(src="PhotoI.png", width='100%', height='auto'),
+                      br(),
+                      br(),
+                      div(class="panel-group", id="accordion", role="tablist", "aria-multiselectable"="true",
+                          HTML(paste0(list.of.panels[16:19], collapse="\n"))
+                      )
+               ),
              ),
     tool(),
     inverse=TRUE
