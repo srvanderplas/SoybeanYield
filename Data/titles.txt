@@ -1,0 +1,22 @@
+The soybean planting decision tool
+Databases
+How does the decision tool work?
+Prediction of soybean developmental stage
+Methodology used to predict soybean development
+Temperature and photoperiod effects on development
+Effect of maturity group on relative yield
+
+Relative yield response to planting date
+How is relative yield calculated?
+Potential yield, actual yield, and yield gap
+
+Planting date effects on crop emergence
+Frost Risk
+Crop failures
+APSIM model description 
+Model availability and source code
+Disclaimer
+
+Acknowledgements
+About the authors and contact information
+References
