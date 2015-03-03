@@ -1,17 +1,17 @@
-<div align="center"><img src="Fig.1.MapWithToolCoverage.png" width='80%' height='auto'></div>
+<div align="center"><img src="Fig.1.MapWithToolCoverage.jpg" width='80%' height='auto'></div>
 <div align='center'><table><tr><td colspan=4 style="padding-bottom:10px;" align="center">Table 1: Measured soybean data from Iowa that are included in the decision tool</td></tr><tr></tr><tr><th style="border-bottom: 1px solid black; border-top:1px solid black;padding-left: 10px; padding-right:10px;">Region</th><th style="padding-left: 10px; padding-right:10px;border-bottom: 1px solid black; border-top:1px solid black;padding-left: 10px; padding-right:10px;">Site</th><th style="padding-left: 10px; padding-right:10px;border-bottom: 1px solid black; border-top:1px solid black;">Planting date</th><th style="padding-left: 10px; padding-right:10px;border-bottom: 1px solid black; border-top:1px solid black;">Maturity group</th></tr><tr><td style="padding-left: 10px; padding-right:10px;">Northeast</td><td style="padding-left: 10px; padding-right:10px;">Nashua</td><td style="padding-left: 10px; padding-right:10px;">May 5, May 20, June 10, June 30</td><td style="padding-left: 10px; padding-right:10px;">2.0, 2.5 </td></tr><tr><td style="padding-left: 10px; padding-right:10px;">North Central</td><td style="padding-left: 10px; padding-right:10px;">Kanawha</td><td style="padding-left: 10px; padding-right:10px;">May 5, May 20, June 10, July 10</td><td style="padding-left: 10px; padding-right:10px;">2.0, 2.5</td></tr> <tr><td style="padding-left: 10px; padding-right:10px;">Northwest</td><td style="padding-left: 10px; padding-right:10px;">Sutherland</td><td style="padding-left: 10px; padding-right:10px;">May 5, May 20, June 10, July 5</td><td style="padding-left: 10px; padding-right:10px;">2.0, 2.5 </td></tr> <tr><td style="padding-left: 10px; padding-right:10px;">Central</td><td style="padding-left: 10px; padding-right:10px;">Ames</td><td style="padding-left: 10px; padding-right:10px;">May 5, May 20, June 10, July 10</td><td style="padding-left: 10px; padding-right:10px;">2.0, 2.5, 3.5</td></tr> <tr><td style="padding-left: 10px; padding-right:10px;">Southeast</td><td style="padding-left: 10px; padding-right:10px;">Crawfordsville</td><td style="padding-left: 10px; padding-right:10px;">May 5, May 20, June 10, June 25</td><td style="padding-left: 10px; padding-right:10px;">2.5, 3.5, 4.0</td></tr> <tr><td style="padding-left: 10px; padding-right:10px;">South Central</td><td style="padding-left: 10px; padding-right:10px;">Chariton</td><td style="padding-left: 10px; padding-right:10px;">May 5, May 20, June 10, June 25</td><td style="padding-left: 10px; padding-right:10px;">2.5, 3.5, 4.0</td></tr> <tr><td style="border-bottom: 1px solid black;padding-left: 10px; padding-right:10px;">Southwest</td><td style="border-bottom: 1px solid black;padding-left: 10px; padding-right:10px;">Lewis</td><td style="border-bottom: 1px solid black;padding-left: 10px; padding-right:10px;">May 5, May 20, June 5, July 5</td><td style="border-bottom: 1px solid black;padding-left: 10px; padding-right:10px;">2.5, 3.5, 4.0</td></tr></table></div>
 
-<div align="center"><img src="Fig.2.PhenologyVersus3DaysFor2.5Ames.png" width='80%' height='auto'></div>
+<div align="center"><img src="Fig.2.PhenologyVersus3DaysFor2.5Ames.jpg" width='80%' height='auto'></div>
 
-<div align="center"><img src="Fig.3.TempXPhotoperiod.png" width='50%' height='auto'></div>
-<div align="center"><img src="Fig.4.YieldByMaturity.png" width='50%' height='auto'></div>
-<div align="center"><img src="Fig.5.YieldByDate.png" width='50%' height='auto'></div>
+<div align="center"><img src="Fig.3.TempXPhotoperiod.jpg" width='50%' height='auto'></div>
+<div align="center"><img src="Fig.4.YieldByMaturity.jpg" width='50%' height='auto'></div>
+<div align="center"><img src="Fig.5.YieldByDate.jpg" width='50%' height='auto'></div>
 
-<div align="center"><img src="Fig.6.MaximumYields.png" width='50%' height='auto'></div>
-<div align="center"><img src="Fig.7.YieldGap.png" width='50%' height='auto'></div>
-<div align="center"><img src="Fig.8.Emergence.png" width='80%' height='auto'></div>
-<div align="center"><img src="Fig.9.Frost.png" width='50%' height='auto'></div>
-<div align="center"><img src="Fig.10.CropFailures.png" width='50%' height='auto'></div>
+<div align="center"><img src="Fig.6.MaximumYields.jpg" width='50%' height='auto'></div>
+<div align="center"><img src="Fig.7.YieldGap.jpg" width='50%' height='auto'></div>
+<div align="center"><img src="Fig.8.Emergence.jpg" width='80%' height='auto'></div>
+<div align="center"><img src="Fig.9.Frost.jpg" width='50%' height='auto'></div>
+<div align="center"><img src="Fig.10.CropFailures.jpg" width='50%' height='auto'></div>
 
 
 
