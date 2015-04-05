@@ -1,0 +1,10 @@
+span.navbar-brand {
+  font-size:24px;
+  font-weight:900;
+}
+
+nav ul > li > a {
+  font-size:20px;
+  font-weight:bold;
+}
+
