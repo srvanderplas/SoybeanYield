@@ -537,6 +537,9 @@ shinyServer(function(input, output, session) {
     plot
   })
   
+  # Separate functions to draw the plots
+  # This allows us to separate the drawing of the plot from its rendering. 
+  
   # Plot of development progress
   output$DevelopmentPlot <- renderPlot({
     print(drawDevelopmentPlot())
