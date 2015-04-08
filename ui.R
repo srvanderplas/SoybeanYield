@@ -130,15 +130,21 @@ intro <- function(){
 
 tool <- function(){
   tabPanel(
-    "Tool", 
-    tags$head(tags$link(href="addons.css", rel="stylesheet")),
-    tags$head(tags$link(href="bootstrap.min.css", rel="stylesheet")),
+    
+    # Panel title
+    title = "Tool",
+    
+    # Input panel
     wellPanel(
       fluidRow(
+        # Comparison Variable Help
         column(2, offset=1, 
                br(),
                p("Select a variable to compare up to 3 different values for that variable.")
-              ),
+        ),
+        
+        # Comparison Variable input: input$compare can take values "Location", "PlantDay", or "MG"
+        #    but we want it to have nice labels, not variable names. 
         column(2,
                radioButtons("compare", label="Comparison Variable", 
                             choices=c("Location"="Location", 
@@ -146,62 +152,156 @@ tool <- function(){
                                       "Maturity Group"="MG"), 
                             inline=F)
         ),
+        
+        #  This column contains rows because we want to have things above and below a 3-col layout.
         column(6,
-          fluidRow(
-            p(align="center", "Click on the boxes below to see what options are available.")
-          ),
-          fluidRow(
-            column(4, div(align="center", uiOutput("location"))),
-            column(4, div(align="center", uiOutput("planting"))),
-            column(4, div(align="center", uiOutput("maturity")))
-          ),
-          fluidRow(
-            p(align="center", "You can type or select options to add them (use backspace to remove a selected option)."
-            )
-          )
+               # Input variable help text
+               fluidRow(
+                 p(align="center", "Click on the boxes below to see what options are available.")
+               ),
+               
+               # 3 columns of input variables
+               fluidRow(
+                 # Location input, with values populated by uiStart.rda
+                 column(4, uiOutput("location")),
+                 # Planting dates
+                 column(4, uiOutput("planting")),
+                 # Maturity groups
+                 column(4, uiOutput("maturity"))
+               ),
+               
+               # Help text on entering variables
+               fluidRow(
+                 p(align="center", 
+                   "You can type or select options to add them 
+                   (use backspace to remove a selected option, 
+                   and enter to add an option if you are typing)."
+                 )
+               )
         )
-      )
-    ), 
+      ) # End main fluidRow in WellPanel
+    ), # End wellpanel 
+    
+    # This row contains the soybean development timeline output
     fluidRow(
+      
+      # First, column with the plot and caption
       column(10, 
+             # Plot
              plotOutput("DevelopmentPlot", height=400),
+             
+             # Caption
              div(align="center", 
-                 helpText(strong("Fig. 1"), "Development timeline of soybean cultivars. Outliers (if applicable) are shown as unfilled circles.", br(), "About these plots:", a(href="https://en.wikipedia.org/wiki/Box_plot", "Box plot"), ", ", a(href="https://en.wikipedia.org/wiki/Violin_plot", "Violin plot"))
+                 p(strong("Fig. 1"), 
+                   "Development timeline of soybean cultivars. 
+                   Outliers (if applicable) are shown as unfilled circles."),
+                 helpText("About these plots:", # Links on how to read box and violin plots
+                          a(href="https://en.wikipedia.org/wiki/Box_plot", "Box plot"), ", ", 
+                          a(href="https://en.wikipedia.org/wiki/Violin_plot", "Violin plot"))
              )
-      ),
-      column(2, br(), br(), 
+      ), # End Development Timeline plot column
+      
+      # Column with input options
+      column(2, br(),
              wellPanel(
+               # Well Panel Title
                h4("Plot Options"),
-               radioButtons("plottype", "Plot Type", choices=c("Box Plot" = 1, "Violin Plot" = 2), selected=1), 
+               
+               # Input plot type. 
+               radioButtons("plottype", "Plot Type", 
+                            choices=c("Box Plot" = 1, "Violin Plot" = 2), 
+                            selected=1), # default to box plot
+               
+               # Input variable for facets on the timeline
                checkboxInput("facets", "Show sub-plots", value=FALSE)
              )
-      )
-    ),
+      ) # End Development Timeline Plot Options column
+      
+    ), # End Development  Timeline row
+    
+    # This row contains the relative yield plots and associated input options
     fluidRow(
-      column(5, 
-             plotOutput("YieldByMGPlot", height=400),
-             div(align="center", helpText(strong("Fig. 2"), "Relationship between relative yield and soybean cultivar (maturity group) for a specific planting date(s) and location(s). For Location and Planting Date comparison variables, vertical dotted line(s) indicates the appropriate maturity group for use in a specific location and/or planting date."))), 
-      column(2, br(),br(),
-             wellPanel(
-               strong("Relative Yield by MG Plot:"),
-               radioButtons("plottype2", "Type", choices=c("Fitted Line"=2, "Box Plot" = 1), selected=2),
-               br(),
-               strong("Both Plots:"),
-               checkboxInput("points", label="Show Points"),
-               checkboxInput("ci", label="Show 95% Prediction Interval"),
-               checkboxInput("failed", label="Include Failed Trials?"),
-               checkboxInput("newdata2", "Show 2014 measured data (if available)", value=FALSE)
-             )
-      ),
+      # Yield by MG plot output and caption
       column(5,
+             # Plot
+             plotOutput("YieldByMGPlot", height=400),
+             
+             # Caption
+             div(align="center", 
+                 p(strong("Fig. 2"), 
+                   "Relationship between relative yield and soybean cultivar (maturity group) 
+                   for a specific planting date(s) and location(s). 
+                   For Location and Planting Date comparison variables, 
+                   vertical dotted line(s) indicates the appropriate maturity 
+                   group for use in a specific location and/or planting date.")
+             )
+      ), # End Relative Yield x MG column
+      
+      # Input variables for the two relative yield plots
+      column(2, br(), 
+             
+             # Well panel because input
+             wellPanel(
+               
+               # Input Title
+               strong("Relative Yield by MG Plot:"),
+               
+               # Radio button input$plottype2: Fitted line or box plot?
+               radioButtons("plottype2", "Type", 
+                            choices=c("Fitted Line"=2, "Box Plot" = 1), 
+                            selected=2), # Default to fitted line
+               
+               # Space between titles
+               br(),
+               
+               # Input Title
+               strong("Both Plots:"),
+               
+               # The following inputs are boolean/logical: they take T/F or 1/0 values. 
+               
+               # input$points indicates whether to show points or not. 
+               checkboxInput("points", 
+                             label="Show Points"),
+               
+               # input$ci indicates whether to show the prediction interval
+               checkboxInput("ci", 
+                             label="Show 95% Prediction Interval"),
+               
+               # input$failed indicates whether to include trials which failed due to weather, etc. 
+               checkboxInput("failed", 
+                             label="Include Failed Trials?"),
+               
+               # input$newdata2 indicates whether to show data from 2014 trials.
+               checkboxInput("newdata2", 
+                             "Show 2014 measured data (if available)")
+             )
+      ), # End Relative Yield plot input column
+      
+      column(5,
+             
+             # Plot
              plotOutput("YieldByPlantingPlot", height=400),
-             div(align="center", helpText(strong("Fig. 3"), "Relationship between relative yield and date of planting for a specific cultivar (maturity group) and location. For Location and Maturity Group comparison variables, vertical dotted line(s) indicates the optimum planting date(s) for maximizing yield under a particular combination of cultivar and location.")))
-    ),
-    img(src="Footer.jpg", width='100%', height='auto') 
-  )
-}
-
-
+             
+             # Caption
+             div(align="center", 
+                 p(strong("Fig. 3"), 
+                   "Relationship between relative yield and date of planting 
+                   for a specific cultivar (maturity group) and location. 
+                   For Location and Maturity Group comparison variables, 
+                   vertical dotted line(s) indicates the optimum planting 
+                   date(s) for maximizing yield under a particular combination 
+                   of cultivar and location.")
+                 )
+             ) # End Relative Yield x Planting Date column
+      
+    ), # End Relative Yield row
+    
+    # Footer image with ISU Extension and copyright info. 
+    footer()
+    
+  ) # End TabPanel definition
+  
+} # End tool() function definition
 
 
 # Define UI for application that plots random distributions
