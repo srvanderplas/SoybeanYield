@@ -180,7 +180,9 @@ shinyServer(function(input, output, session) {
         scale_color_brewer(gsub("PlantDay", "Planting\nDate", input$compare), palette="Set1") + 
         scale_fill_brewer(gsub("PlantDay", "Planting\nDate", input$compare), palette="Set1") + 
         geom_rect(aes(ymin=frost.date.lb, ymax=frost.date.ub, xmin=-Inf, xmax=Inf), alpha=.05, fill="black", data=frost.date.df) + 
-        geom_text(aes(y=textlabel, x=y, label=label), data=frost.date.df, hjust=1, vjust=0, size=6) + 
+        geom_text(aes(y=textlabel, x=y, label=label), 
+                  data=unique(frost.date.df[,c("textlabel", "y", "label")]), 
+                  hjust=1, vjust=0, size=6) + 
         xlab("") + ylab("") + 
         geom_vline(aes(xintercept=xintercept), data=guidelines) + 
         theme_bw() + 
