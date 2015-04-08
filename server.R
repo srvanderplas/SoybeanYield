@@ -93,6 +93,15 @@ shinyServer(function(input, output, session) {
     })
   
   
+  # Monitor link to tool tab from intro:
+  observe({
+    
+    # create a dependency on the toTool input object
+    if(input$toTool == 0) return(NULL)
+    
+    updateTabsetPanel(session, "tab", selected="tool")
+  })
+  
   # Function to draw the development timeline, with options for plot type and faceting. 
   drawDevelopmentPlot <- reactive({
     

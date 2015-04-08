@@ -60,6 +60,9 @@ intro <- function(){
   tabPanel(
     "Introduction", # name
     
+    # Set value = "intro" so that we could link to this tab
+    value = "intro",
+    
     # Intro page title
     div(
       align="center", 
@@ -133,6 +136,9 @@ tool <- function(){
     
     # Panel title
     title = "Tool",
+    
+    # Set value = "tool" so that we can link to this tab
+    value="tool",
     
     # Input panel
     wellPanel(
@@ -315,6 +321,9 @@ shinyUI(
     
     # Use dark bar with light text
     inverse=TRUE,
+    
+    # id (important for linking to tabs)
+    id = "tab",
     
     # Header
     header = header(), 
