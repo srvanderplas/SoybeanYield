@@ -88,12 +88,12 @@ shinyUI(
                       br(),
                       br(),
                       div(class="panel-group", id="accordion", role="tablist", "aria-multiselectable"="true",
-                          HTML(paste0(list.of.panels[16:19], collapse="\n"))
                       )
+                          HTML(paste0(list.of.panels[17:20], collapse="\n"))
                ),
                column(width=9,
                       div(class="panel-group", id="accordion", role="tablist", "aria-multiselectable"="true",
-                              HTML(paste0(list.of.panels[1:15], collapse="\n")) 
+                              HTML(paste0(list.of.panels[1:16], collapse="\n")) 
                       )
                )
              ),

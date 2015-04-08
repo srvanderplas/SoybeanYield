@@ -53,7 +53,7 @@ list.of.panels[1] <- list.of.panels[1] %>%
   str_replace(pattern="panel-collapse collapse", replacement="panel-collapse collapse in") %>%
   str_replace(pattern='aria-expanded="false"', replacement='aria-expanded="true"') 
   
-list.of.panels[16:19] <- list.of.panels[16:19] %>% 
+list.of.panels[17:20] <- list.of.panels[17:20] %>% 
   str_replace(pattern="panel-success", replacement="panel-default") 
     
 # <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
