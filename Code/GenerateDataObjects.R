@@ -53,7 +53,7 @@ newdata$Date.of.first.frost2 <- NA
 # Fix MG
 newdata$MG <- round(newdata$MG/.5)*.5
 
-# Variable compatibility
+# Variable compatibility between old data and 2014 data.
 newdata$Year <- 2014
 newdata$VE <- dm(mdy(newdata$VE))
 newdata$R1 <- dm(mdy(newdata$R1))
