@@ -41,7 +41,7 @@ tool <- function(){
       column(10, 
              plotOutput("DevelopmentPlot", height=400),
              div(align="center", 
-                 helpText(strong("Fig. 1"), "Development timeline of soybean cultivars.", br(), "About these plots:", a(href="https://en.wikipedia.org/wiki/Box_plot", "Box plot"), ", ", a(href="https://en.wikipedia.org/wiki/Violin_plot", "Violin plot"))
+                 helpText(strong("Fig. 1"), "Development timeline of soybean cultivars. Outliers (if applicable) are shown as unfilled circles.", br(), "About these plots:", a(href="https://en.wikipedia.org/wiki/Box_plot", "Box plot"), ", ", a(href="https://en.wikipedia.org/wiki/Violin_plot", "Violin plot"))
              )
       ),
       column(2, br(), br(), 
