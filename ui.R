@@ -47,7 +47,7 @@ tool <- function(){
     fluidRow(
       column(5, 
              plotOutput("YieldByMGPlot", height=400),
-             div(align="center", helpText(strong("Fig. 2"), "Relationship between relative yield and soybean cultivar for a specific planting date(s) and location(s). Vertical dotted line(s) indicates the appropriate maturity group for use in a specific location and/or planting date."))), 
+             div(align="center", helpText(strong("Fig. 2"), "Relationship between relative yield and soybean cultivar for a specific planting date(s) and location(s). For Location and Planting Date comparison variables, vertical dotted line(s) indicates the appropriate maturity group for use in a specific location and/or planting date."))), 
       column(2, br(),br(),
              wellPanel(
                strong("Relative Yield by MG Plot:"),
@@ -62,7 +62,7 @@ tool <- function(){
       ),
       column(5,
              plotOutput("YieldByPlantingPlot", height=400),
-             div(align="center", helpText(strong("Fig. 3"), "Relationship between relative yield and date of planting for a specific cultivar and location. Vertical dotted line(s) indicates the optimum planting date(s) for maximizing yield under a particular combination of cultivar and location.")))
+             div(align="center", helpText(strong("Fig. 3"), "Relationship between relative yield and date of planting for a specific cultivar and location. For Location and Maturity Group comparison variables, vertical dotted line(s) indicates the optimum planting date(s) for maximizing yield under a particular combination of cultivar and location.")))
     ),
     img(src="Footer.jpg", width='100%', height='auto') 
   )
