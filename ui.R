@@ -304,31 +304,27 @@ tool <- function(){
 } # End tool() function definition
 
 
-# Define UI for application that plots random distributions
+# Define UI
 shinyUI(
+  
+  # navbarPage has a bar at the top (or bottom) with links to navigate between tabs
   navbarPage(
+    
+    # Page title
     title="Soybean Planting Decision Tool", 
-    tabPanel("Introduction", 
-             div(align="center", h1("Understanding interactions between soybean planting date and maturity across environments"), br()),
-             fluidRow(
-               column(width=3, 
-                      img(src="PhotoIIISoybeanemergen.jpg", width='100%', height='auto'),
-                      br(), br(),
-                      div(class="panel-group", id="accordion", role="tablist", "aria-multiselectable"="true",
-                          HTML(paste0(list.of.panels[17:20], collapse="\n"))
-                      ),
-                      br(), br(),
-                      img(src="PhotoI.jpg", width='100%', height='auto'),
-                      br(), br()
-               ),
-               column(width=9,
-                      div(class="panel-group", id="accordion", role="tablist", "aria-multiselectable"="true",
-                              HTML(paste0(list.of.panels[1:16], collapse="\n")) 
-                      )
-               )
-             ),
-             img(src="Footer.jpg", width='100%', height='auto') 
-             ),
-    tool(),
-    inverse=TRUE
-))
+    
+    # Use dark bar with light text
+    inverse=TRUE,
+    
+    # Header
+    header = header(), 
+    
+    # Create introduction tab
+    intro(),
+    
+    # Create tool in its own tab
+    tool()
+    
+  ) # end navbarPage definition
+
+) # end UI definition
