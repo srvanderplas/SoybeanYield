@@ -119,7 +119,7 @@ shinyServer(function(input, output, session) {
       }
       textdata$facet <- textdata[,input$compare]
       
-      # Create planting date which has year=2000
+      # Create planting date which has year=2000 and add variable seconds to that date (to get "boxplots" for planting date stage)
       plant.dates <- ydm(paste0("2000-", input$planting))
       second(longdata.sub$Date) <- (longdata.sub$PlantDay%in%input$planting)*(longdata.sub$Stage=="Planting")*sample(1:2, nrow(longdata.sub), replace=T)
       
