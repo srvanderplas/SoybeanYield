@@ -12,8 +12,121 @@ library(shiny)
 load("Data/uiStart.rda")
 
 # Intro.R creates HTML from the 4 text files in ./Data (text, titles, captions, and figures). 
-# This code creates the expandable panels on the "Introduction" page of the applet. 
+# This code creates the text/HTML for the expandable panels on the "Introduction" page of the applet. 
+# Specifically, creates list.of.panels 
 source("Code/Intro.R")
+# Once the text, figures, etc. are stable, this function call 
+# could be moved into GenerateDataObjects.R
+# So long as the object list.of.panels is saved in uiStart.rda
+
+# About Shiny/Bootstrap integration: 
+# Bootstrap (and Shiny) divide a page into 12 columns, 
+# so that these columns can be rearranged for mobile devices.
+# Every input belongs in a column so that it can be resized. 
+# http://getbootstrap.com/css/
+# in Shiny:
+#    fluidRow() allows columns to be rearranged for mobile browsers.
+#    fixedRow() would make a column that would not rearrange.
+
+# Function to print footer in each tab
+footer <- function(){
+  img(src="Footer.jpg", width='100%', height='auto')
+}
+
+# Define header to be used across all tabs
+header <- function(){
+  
+  # CSS files and other links which belong in the header
+  
+  tags$head(
+    # CSS for bootstrap modifications: 
+    #    Change the size of the title and Tab labels, 
+    #    make input labels a bit larger.
+    tags$link(href="addons.css", rel="stylesheet"),
+    
+    # Bootstrap CSS for animated panels, etc. 
+    # Reference: http://getbootstrap.com/css/
+    tags$link(href="bootstrap.min.css", rel="stylesheet")
+  )
+  
+} # end header function definition
+
+
+# I define the intro and tool tabs in functions
+# because it's much easier to make the code modular
+# when each tab is in a separate space and clearly delineated 
+
+intro <- function(){
+  tabPanel(
+    "Introduction", # name
+    
+    # Intro page title
+    div(
+      align="center", 
+      h1("Understanding interactions between soybean planting date and maturity across environments")
+    ), 
+    
+    # Space
+    br(),
+    
+    # Everything but the footer and title in this row!
+    fluidRow(
+      
+      # Side panel/column with pictures and information about the project itself
+      column(
+        width=3, 
+        
+        # Cute baby soybean sprout
+        img(src="PhotoIIISoybeanemergen.jpg", width='100%', height='auto'),
+        
+        br(), 
+        br(),
+        
+        # Expandable set of tab panels with 
+        # Disclaimer, Acknowledgements, Contact Info, and References
+        div(
+          class="panel-group", 
+          id="accordion", 
+          role="tablist", 
+          "aria-multiselectable"="true", # Can multiple panels be expanded at once?
+          
+          # Output HTML of the last 4 tab panels
+          HTML(paste0(list.of.panels[17:20], collapse="\n"))
+        ),
+        
+        br(), 
+        br(),
+        
+        # Fuzzy soybean in the field
+        img(src="PhotoI.jpg", width='100%', height='auto'),
+        
+        br(), 
+        br()
+        
+      ), # End sidebar column
+      
+      # This column contains the expandable panels. 
+      column(
+        width=9,
+        div(
+          class="panel-group", 
+          id="accordion", 
+          role="tablist", 
+          "aria-multiselectable"="true", # Can multiple panels be expanded at once?
+          
+          # Output HTML of the first 16 tab panels, with matching figures, etc.
+          HTML(paste0(list.of.panels[1:16], collapse="\n")) 
+        )
+      ) # End column with expandable panels
+      
+    ), # End content row
+    
+    # Footer image with ISU Extension and copyright info. 
+    footer()
+    
+  ) # End tabPanel definition
+  
+} # End intro() function definition
 
 tool <- function(){
   tabPanel(
