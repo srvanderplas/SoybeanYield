@@ -1,5 +1,18 @@
 library(shiny)
+
+
+# When updating the applet, be sure to run GenerateDataObjects.R if the data has changed. 
+# GenerateDataObjects.R contains code to pre-process the data files - 
+# this does not need to happen every time the applet is loaded, but should happen when the
+# underlying data files change. 
+
+# Data/uiStart.rda and Data/serverStart.rda depend on GenerateDataObjects
+
+# Variables to populate the drop-down menus in the tool
 load("Data/uiStart.rda")
+
+# Intro.R creates HTML from the 4 text files in ./Data (text, titles, captions, and figures). 
+# This code creates the expandable panels on the "Introduction" page of the applet. 
 source("Code/Intro.R")
 
 tool <- function(){
