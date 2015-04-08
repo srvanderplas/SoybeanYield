@@ -126,14 +126,19 @@ shinyServer(function(input, output, session) {
       textdata$ymax[is.na(textdata$ymax)] <- textdata$ymax.backup[is.na(textdata$ymax)]
       textdata <- textdata[,which(names(textdata)%in%tmp)]
       
+      # Add variable seconds to the planting date (to get "boxplots" for planting date stage)
+      second(longdata.sub$Date) <- (longdata.sub$PlantDay%in%input$planting)*(longdata.sub$Stage=="Planting")*sample(1:2, nrow(longdata.sub), replace=T)
       
+      # Get yield data (wide form)
       yield.sub <- filter(yield, MG%in%input$maturity & 
                             Location%in%input$location & 
                             PlantDay%in%input$planting)
       yield.sub$facet <- yield.sub[,input$compare]
       
+      # Create guide lines between maturity stages
       guidelines <- expand.grid(xintercept=seq(.5, 5.5, 1), facet=unique(yield.sub$facet))
       
+      # Calculate frost dates and add variability so lines don't entirely overlap
       frost.date.df <- yield.sub %>% 
         group_by(Location, PlantDay, MG, facet) %>% 
         do(data.frame(frost.date=floor_date(quantile(.$Date.of.first.frost2, .5, na.rm=T), "day"), 
@@ -142,6 +147,7 @@ shinyServer(function(input, output, session) {
         as.data.frame()
       hour(frost.date.df$frost.date) <- sample(0:11, nrow(frost.date.df))
       
+      # Calculate lower bound and upper bound on frost date, plus median line for all locations, etc. 
       frost.date.df$frost.date.lb <- floor_date(
         quantile(
           filter(yield, MG%in%input$maturity & 
@@ -160,36 +166,49 @@ shinyServer(function(input, output, session) {
                             .5, na.rm=T), "day")
       frost.date.df$textlabel <- 
         floor_date(median(frost.date.df$frost.date), "day")
+
       
       if(input$plottype=="1"){
+        # Boxplot
         plot <- ggplot() + 
           stat_boxplot(aes(x=Stage, y=Date, fill=factor(facet), color=factor(facet)), 
                        alpha=.3, shape=1, position=position_dodge(), data=longdata.sub, width=0.9)
       } else {
+        # Violin plot
         plot <- ggplot() + 
           geom_violin(aes(x=Stage, y=Date, fill=factor(facet), color=factor(facet)), 
                       alpha=.3, data=longdata.sub, scale="width", adjust=2)
       }
       
+      # Function to label facets correctly - MG: __, Location: __, Planting Date: __
       label_facet <- function(x, y){
-        paste0(gsub("PlantDay", "Planting\nDate", input$compare), ": ", y)
+        paste0(gsub("PlantDay", "Planting Date", input$compare), ": ", y)
       }
       
+      # Add facets?
       if(input$facets){
         plot <- plot + facet_grid(.~facet, labeller=labeller(facet=label_facet))
       }
       
+      # Other plot stuff
       plot <- plot + 
+        # "Not Acheived" labels
         geom_text(aes(x=Stage, y=ymax, ymax=ymax, label=text, color=factor(facet)), 
-                  data=textdata, position=position_dodge(width=0.9), hjust=1, show_guide=F) +
-        coord_flip() + 
-        scale_color_brewer(gsub("PlantDay", "Planting\nDate", input$compare), palette="Set1") + 
-        scale_fill_brewer(gsub("PlantDay", "Planting\nDate", input$compare), palette="Set1") + 
-        geom_rect(aes(ymin=frost.date.lb, ymax=frost.date.ub, xmin=-Inf, xmax=Inf), alpha=.05, fill="black", data=frost.date.df) + 
+                  data=textdata, position=position_dodge(width=0.9), hjust=1, show_guide=F) + 
+        # Frost rectangle
+        geom_rect(aes(ymin=frost.date.lb, ymax=frost.date.ub, xmin=.5, xmax=5.5), alpha=.05, fill="black", data=frost.date.df) + 
+        # Frost label
         geom_text(aes(y=textlabel, x=y, label=label), 
                   data=unique(frost.date.df[,c("textlabel", "y", "label")]), 
-                  hjust=1, vjust=0, size=6) + 
+                  hjust=1, vjust=-.1, size=6) +
+        # Flip 90 degrees
+        coord_flip() + 
+        # Color Scales
+        scale_color_brewer(gsub("PlantDay", "Planting\nDate", input$compare), palette="Set1") + 
+        scale_fill_brewer(gsub("PlantDay", "Planting\nDate", input$compare), palette="Set1") + 
+        # Remove Axis labels
         xlab("") + ylab("") + 
+        # Add guide lines
         geom_vline(aes(xintercept=xintercept), data=guidelines) + 
         theme_bw() + 
         theme(plot.title=element_text(size=18), 
@@ -200,6 +219,7 @@ shinyServer(function(input, output, session) {
               panel.grid.minor.y=element_line(color="black")) +
         ggtitle("Development Timeline of Soybeans")
       
+      # Frost date dotted lines: if Location is comparison, plot with colors, otherwise, black and white.
       if(input$compare=="Location") {
         plot <- plot + 
           geom_segment(aes(y=frost.date, yend=frost.date, x=y+.25, xend=Inf, 
@@ -212,6 +232,7 @@ shinyServer(function(input, output, session) {
     }
   })
   
+  # Function to draw a plot of yield by Maturity with options for plot type, displayed points (data and simulated values), and intervals.
   drawYieldByMGPlot <- reactive({
     if(length(input$location)>0 & length(input$planting)>0 & length(input$compare)>0){
       plotdata <- filter(yield, 
