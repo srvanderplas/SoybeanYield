@@ -120,14 +120,6 @@ shinyServer(function(input, output, session) {
       } else {
         plant.dates.df <- data.frame(x=plant.dates, y=.5, yend=1.5, facet=unique(input$planting))
       }
-      #       
-      #       quantile.sub <- longdata.sub %>% 
-      #         group_by(Location, PlantDay, MG, Stage, facet) %>% 
-      #         do(data.frame(q25=floor_date(quantile(.$Date, .25, na.rm=T), "day"), 
-      #                       q50=floor_date(quantile(.$Date, .5, na.rm=T), "day"),
-      #                       q75=floor_date(quantile(.$Date, .75, na.rm=T), "day")))
-      #         
-      
       
       yield.sub <- filter(yield, MG%in%input$maturity & 
                             Location%in%input$location & 
