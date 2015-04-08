@@ -245,6 +245,7 @@ shinyServer(function(input, output, session) {
         plotdata$facet <- NA
       }
       
+      # Include failed trials?
       if(!input$failed){
         plotdata <- filter(plotdata, Comment!="failure")
       }
@@ -268,6 +269,8 @@ shinyServer(function(input, output, session) {
         plotdata <- plotdata %>% group_by(facet) %>% mutate(nyield=100*Yield/max(Yield)) %>% as.data.frame
         plotdata$jitterMG <- jitter(plotdata$MG, amount=.2)
         
+      # Fit splines for each selected case 
+      # Splines are used instead of loess because it's easier to get SE/prediction intervals out. 
         spline.data <- plotdata %>% group_by(facet) %>% do({
           set.seed(9852996)
           bx3 <- cbind(I=1, ns(.$jitterMG, df=3)) 
@@ -277,14 +280,17 @@ shinyServer(function(input, output, session) {
           tmp
         })
         
+        # Find maximum value for each spline
         spline.max <- spline.data %>% group_by(facet) %>% do({
           .[which.max(.$fit.fit),]
         })
         
+        # "Jitter" non-unique maximum values so dotted line is visible for each factor variable (e.g. Location)
         if(nrow(spline.max)>1 & length(unique(spline.max$MG))<nrow(spline.max)){
           spline.max$MG <- spline.max$MG + seq(-.05, .05, length.out = nrow(spline.max))
         }    
         
+        # Plot points (if selected)
         if(input$points){
           plot <- ggplot() + 
             geom_point(data=plotdata, aes(x=jitterMG, y=nyield), alpha=.25) 
@@ -292,6 +298,7 @@ shinyServer(function(input, output, session) {
           plot <- ggplot()
         }
         
+        # Plot new data (2014 trials) if selected
         if(input$newdata2){
           newdata <- filter(plotdata, Year==2014)
           if(nrow(newdata)>0){
