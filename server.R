@@ -230,15 +230,20 @@ shinyServer(function(input, output, session) {
                        data=frost.date.df, linetype=2, show_guide=F)
       }
     }
+    # Print the plot!
+    plot
   })
   
   # Function to draw a plot of yield by Maturity with options for plot type, displayed points (data and simulated values), and intervals.
   drawYieldByMGPlot <- reactive({
+    # Are inputs present?
     if(length(input$location)>0 & length(input$planting)>0 & length(input$compare)>0){
+      # Filter plotdata according to inputs
       plotdata <- filter(yield, 
                          Location%in%input$location &
                            PlantDay%in%input$planting)
       plotdata$Location <- factor(plotdata$Location, levels=input$location, ordered=T)
+      # Choose facet/color variable with care - if X = comparison variable, show blank plot. 
       if(input$compare!="MG"){
         plotdata$facet <- plotdata[,input$compare]
       } else {
@@ -313,7 +318,9 @@ shinyServer(function(input, output, session) {
         }
         
         if(input$plottype2=="2"){
+          # Plot lines
           if(sum(is.na(plotdata$facet))>0){
+            # If no facets (because MG is selected for comparison) then use a plain plot
             plot <- plot + 
               geom_line(data=spline.data, aes(x=jitterMG, y=fit.fit), size=2)
             if(input$ci){
@@ -324,6 +331,7 @@ shinyServer(function(input, output, session) {
                           linetype=2) 
             }
           } else {
+            # Color and such
             plot <- plot + 
               geom_line(data=spline.data, aes(x=jitterMG, y=fit.fit, colour=factor(facet)), size=2, alpha=1/sqrt(nrow(spline.max))) +
               scale_colour_brewer(gsub("PlantDay", "Planting\nDate", input$compare),palette="Set1") + 
@@ -339,6 +347,7 @@ shinyServer(function(input, output, session) {
             }
           }
         } else {
+          # Plot boxplots
           if(sum(is.na(plotdata$facet))>0){
             plot <- plot + 
               geom_boxplot(data=plotdata, aes(x=MG, y=nyield, group=round_any(MG*2, 1)/2), fill=NA)
@@ -353,6 +362,7 @@ shinyServer(function(input, output, session) {
           }
         }
         
+        # Other plot decorations, like labels
         plot <- plot + 
           scale_y_continuous(breaks=c(0, 25, 50, 75, 100), name="Relative Yield (%)", limits=c(min(c(0,spline.data$fit.fit)), 110)) + 
           scale_x_continuous(breaks=0:5, labels=0:5, name="Maturity Group") + 
@@ -367,6 +377,7 @@ shinyServer(function(input, output, session) {
           ggtitle(paste0("Relative Yield by Maturity Group"))
       }
     } else {
+      # "I have no input" plot
       plot <- qplot(x=0, y=0, label="Waiting for input", geom="text") + 
         theme_bw() + 
         theme(plot.title = element_text(size = 18), 
@@ -380,24 +391,30 @@ shinyServer(function(input, output, session) {
         ggtitle(paste0("Relative Yield by Maturity Group")) + 
         xlab(NULL) + ylab(NULL)
     }
+    # Print the plot!
     plot
   })
   
   drawYieldByPlantingPlot <- reactive({
+    # Are inputs present?
     if(length(input$location)>0 & length(input$maturity)>0 & length(input$compare)>0){
+      # Filter plotdata according to inputs
       plotdata <- filter(yield, 
                          Location%in%input$location &
                            MG%in%input$maturity)
       plotdata$Location <- factor(plotdata$Location, levels=input$location, ordered=T)
+      # Choose facet/color variable with care - if X = comparison variable, show blank plot. 
       if(input$compare!="PlantDay"){
         plotdata$facet <- plotdata[,input$compare]
       } else {
         plotdata$facet <- NA
       }
       
+      # Include failed trials?
       if(!input$failed){
         plotdata <- filter(plotdata, Comment!="failure")
       }
+      
       # Any non-zero yield data? If not, draw a plot saying "No yield". Otherwise, continue. 
       if(sum(plotdata$Yield!=0)==0){
         plot <- qplot(x=0, y=0, label="No yield under these parameters", geom="text") + 
@@ -413,9 +430,12 @@ shinyServer(function(input, output, session) {
           ggtitle(paste0("Relative Yield by Maturity Group")) + 
           xlab(NULL) + ylab(NULL)
       } else {
+        # Plot of yield data
         plotdata$nyield <- 100*plotdata$Yield/max(plotdata$Yield, na.rm=TRUE)
         plotdata$jitterDate <- yday(plotdata$Planting2)
         
+        # Fit splines for each selected case 
+        # Splines are used instead of loess because it's easier to get SE/prediction intervals out. 
         spline.data <- plotdata %>% group_by(facet) %>% do({
           set.seed(9852996)
           bx5 <- cbind(I=1, ns(.$jitterDate, df=5)) 
@@ -425,10 +445,12 @@ shinyServer(function(input, output, session) {
           tmp
         })
         
+        # Find maximum value for each spline
         spline.max <- spline.data %>% group_by(facet) %>% do({
           .[which.max(.$fit.fit),]
         })
         
+        # Plot points (if selected)
         if(input$points){
           plot <- ggplot() + 
             geom_jitter(data=plotdata, aes(x=jitterDate, y=nyield), alpha=.25) 
@@ -436,7 +458,7 @@ shinyServer(function(input, output, session) {
           plot <- ggplot()
         }
         
-        
+        # Plot new data (2014 trials) if selected
         if(input$newdata2){
           newdata <- filter(plotdata, Year==2014)
           if(nrow(newdata)>0){
@@ -451,6 +473,7 @@ shinyServer(function(input, output, session) {
           }
         }
         
+        # If no facets (because Planting Date is selected for comparison) use a plain plot
         if(sum(is.na(plotdata$facet))>0){
           plot <- plot + 
             geom_line(data=spline.data, aes(x=jitterDate, y=fit.fit), size=2) + 
@@ -463,6 +486,7 @@ shinyServer(function(input, output, session) {
                         linetype=2)
           }
         } else {
+          # Color and such
           plot <- plot + 
             geom_line(data=spline.data, aes(x=jitterDate, y=fit.fit, colour=factor(facet)), size=2, alpha=1/sqrt(nrow(spline.max))) + 
             scale_colour_brewer(gsub("PlantDay", "Planting\nDate", input$compare),palette="Set1") + 
@@ -478,6 +502,7 @@ shinyServer(function(input, output, session) {
           }
         }
         
+        # Other plot decorations, like labels
         plot <-  plot + 
           scale_y_continuous(breaks=c(0, 25, 50, 75, 100), name="Relative Yield (%)", limits=c(min(c(0,spline.data$fit.fit)), 110)) + 
           scale_x_continuous("Planting Date", breaks=c(92, 122, 153, 183, 214, 245), 
@@ -494,6 +519,7 @@ shinyServer(function(input, output, session) {
           ggtitle(paste0("Relative Yield by Planting Date"))
       }
     } else {
+      # "I have no input" plot
       plot <- qplot(x=0, y=0, label="Waiting for input", geom="text") + 
         theme_bw() + 
         theme(plot.title = element_text(size = 18), 
@@ -507,6 +533,7 @@ shinyServer(function(input, output, session) {
         ggtitle(paste0("Relative Yield by Planting Date")) + 
         xlab(NULL) + ylab(NULL)
     }
+    # Print the plot!
     plot
   })
   
