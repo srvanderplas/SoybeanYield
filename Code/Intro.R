@@ -1,3 +1,5 @@
+# See long comment at the end for a link showing a bootstrap example.
+
 # R code to generate collapsible panel groups. 
 library(shiny)
 library(htmltools)
@@ -5,10 +7,9 @@ library(plyr)
 library(magrittr)
 library(stringr)
 
-# <img src="photo I.png" width='80%' height='auto'>
-#   <img src="photo II soybean experiment.png" width='80%' height='auto'>
-#   <img src="Photo III SoybeanEmergen.png" width='80%' height='auto'>
-  
+# Read in the files
+# Each line is a separate image/text combination. 
+# Line numbers must match across files!
 paper <- data.frame(
   title = readLines("./Data/titles.txt"),
   text = readLines("./Data/text.txt"),
@@ -17,10 +18,18 @@ paper <- data.frame(
   stringsAsFactors=F
   )
 
+
+# Panels with multiple images have a blank line in the "title" 
+# file corresponding to a dummy panel - these lines are collapsed
+
+# Indicates whether a title is unique 
+# this lets us calculate the number of actual panels.
+# A panel = title + text + (figure + caption)? + (figure + caption)?
 paper$unique <- 1
 paper$unique[paper$title==""] <- 0
 paper$idx <- cumsum(paper$unique)
 
+# Collapse multiple-image panels by adding text in separate paragraph tags
 paper.condensed <- ddply(paper, .(idx), function(df){
   data.frame(
     title=df$title[1],
@@ -29,13 +38,16 @@ paper.condensed <- ddply(paper, .(idx), function(df){
   )
 })
 
+# Remove redundant/empty tags. 
 paper.condensed$text <- paper.condensed$text %>%
   str_replace(pattern="<br><p align='center'></p>$", replacement="")
 
+# Add values for headers, link ID's (#), and controls.
 paper.condensed$headings <- sprintf("heading%02d", paper.condensed$idx)
 paper.condensed$href <-  sprintf("#collapse%02d", paper.condensed$idx)
 paper.condensed$aria.controls <- sprintf("collapse%02d", paper.condensed$idx)
 
+# Create list of panels in HTML by inserting values with sprintf()
 list.of.panels <- 
   sprintf(
     '<div class="panel panel-success">
@@ -47,15 +59,30 @@ list.of.panels <-
         <div id="%s" class="panel-collapse collapse", role="tabpanel" aria-labelledby="%s">
           <div class="panel-body"> %s </div>
         </div>
-     </div>', paper.condensed$headings, paper.condensed$href, paper.condensed$aria.controls, paper.condensed$title, paper.condensed$aria.controls, paper.condensed$headings, paper.condensed$text)
+     </div>', 
+    paper.condensed$headings, # panel-heading ID
+    paper.condensed$href, # panel title link ID
+    paper.condensed$aria.controls, # aria controls in panel title link
+    paper.condensed$title, # panel title 
+    paper.condensed$aria.controls, # aria data ID (to make expansion work)
+    paper.condensed$headings, # aria heading label
+    paper.condensed$text # Actual panel text
+  )
 
+# Clean up html: 
+# Expand the first tab
 list.of.panels[1] <- list.of.panels[1] %>% 
   str_replace(pattern="panel-collapse collapse", replacement="panel-collapse collapse in") %>%
   str_replace(pattern='aria-expanded="false"', replacement='aria-expanded="true"') 
-  
+
+# change CSS values for sidebar panels so that they're grey instead of green
 list.of.panels[17:20] <- list.of.panels[17:20] %>% 
   str_replace(pattern="panel-success", replacement="panel-default") 
-    
+
+
+# Here is the sample HTML from http://getbootstrap.com/javascript/#collapse-example-accordion
+# We have to generate this HTML with R
+
 # <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 #   <div class="panel panel-default">
 #   <div class="panel-heading" role="tab" id="headingOne">
