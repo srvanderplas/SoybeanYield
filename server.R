@@ -173,20 +173,6 @@ shinyServer(function(input, output, session) {
         plot <- plot + facet_grid(.~facet, labeller=labeller(facet=label_facet))
       }
       
-#       if(input$newdata){
-#         newdata <- subset(longdata.sub, Year==2014)
-#         if(nrow(newdata)>0){
-#           tmp <- newdata
-#           flevels <- seq(-.4, .4, length.out=length(unique(tmp$facet))+1)
-#           fjitter <- runif(nrow(tmp), 
-#                            (flevels[1:length(unique(tmp$facet))])[as.numeric(droplevels(tmp$facet))],
-#                            (flevels[(1:length(unique(tmp$facet)))+1])[as.numeric(droplevels(tmp$facet))])  
-#           tmp$Stage <- as.numeric(tmp$Stage) + fjitter
-#           plot <- plot + geom_point(aes(x=Stage, y=Date, color=factor(facet)),
-#                                     size=3, data=tmp, show_guide=F)
-#         }
-#       }
-      
       plot <- plot + 
         geom_text(aes(x=Stage, y=ymax, ymax=ymax, label=text, color=factor(facet)), 
                   data=textdata, position=position_dodge(width=0.9), hjust=1, show_guide=F) +
