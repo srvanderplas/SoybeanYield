@@ -64,7 +64,7 @@ tool <- function(){
              plotOutput("YieldByPlantingPlot", height=400),
              div(align="center", helpText(strong("Fig. 3"), "Relationship between relative yield and date of planting for a specific cultivar and location. Vertical dotted line(s) indicates the optimum planting date(s) for maximizing yield under a particular combination of cultivar and location.")))
     ),
-    img(src="PhotoIISoybeanExperiment.jpg", width='100%', height='auto')
+    img(src="Footer.jpg", width='100%', height='auto') 
   )
 }
 
@@ -97,7 +97,7 @@ shinyUI(
                       )
                )
              ),
-             img(src="PhotoIISoybeanExperiment.jpg", width='100%', height='auto')
+             img(src="Footer.jpg", width='100%', height='auto') 
              ),
     tool(),
     inverse=TRUE
