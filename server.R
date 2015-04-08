@@ -119,6 +119,12 @@ shinyServer(function(input, output, session) {
       }
       textdata$facet <- textdata[,input$compare]
       
+      # merge in maximum values to calculate ymax for NA values
+      tmp <- names(textdata)
+      textdata <- merge(textdata, maxvals[[input$compare]][,c(1, 2, 4)], all.x=T, all.y=F)
+      textdata$y[is.na(textdata$y)] <- textdata$ymax.backup[is.na(textdata$y)]
+      textdata$ymax[is.na(textdata$ymax)] <- textdata$ymax.backup[is.na(textdata$ymax)]
+      textdata <- textdata[,which(names(textdata)%in%tmp)]
       
       
       yield.sub <- filter(yield, MG%in%input$maturity & 
