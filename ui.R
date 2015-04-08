@@ -8,25 +8,33 @@ tool <- function(){
     tags$style(type="text/css", "label {font-size: 14px;}"),
     tags$head(tags$link(href="addons.css", rel="stylesheet")),
     tags$head(tags$link(href="bootstrap.min.css", rel="stylesheet")),
-    br(), br(), 
-    wellPanel( 
+    wellPanel(
       fluidRow(
-        column(4, 
+        column(2, offset=1, 
                br(),
-               p("Select a variable to compare up to 3 different values for that variable. You may only select one variable at a time to compare in this way."),
-               br(),
-               p("Click on the boxes below to see what options are available."),
-               p("You can type or select options to add them (use backspace to remove a selected option).")),
-        
-        column(2, radioButtons("compare", label="Comparison Variable", 
-                               choices=c("Location"="Location", "Planting Date"="PlantDay", "Maturity Group"="MG"), 
-                               inline=F),
-               p("You may select up to three values for the variable chosen as the comparison variable.")),
-        column(2, 
-               div(align="center", uiOutput("location")),
-               div(align="center", uiOutput("planting")),
-               div(align="center", uiOutput("maturity"))),
-        column(4, div(align="center", helpText("Logo(s) go here")))
+               p("Select a variable to compare up to 3 different values for that variable.")
+              ),
+        column(2,
+               radioButtons("compare", label="Comparison Variable", 
+                            choices=c("Location"="Location", 
+                                      "Planting Date"="PlantDay", 
+                                      "Maturity Group"="MG"), 
+                            inline=F)
+        ),
+        column(6,
+          fluidRow(
+            p(align="center", "Click on the boxes below to see what options are available.")
+          ),
+          fluidRow(
+            column(4, div(align="center", uiOutput("location"))),
+            column(4, div(align="center", uiOutput("planting"))),
+            column(4, div(align="center", uiOutput("maturity")))
+          ),
+          fluidRow(
+            p(align="center", "You can type or select options to add them (use backspace to remove a selected option)."
+            )
+          )
+        )
       )
     ), 
     fluidRow(
@@ -75,21 +83,18 @@ tool <- function(){
 shinyUI(
   navbarPage(
     title="Soybean Planting Decision Tool", 
-    position="fixed-top",
     tabPanel("Introduction", 
-             br(), br(),
              div(align="center", h1("Understanding interactions between soybean planting date and maturity across environments"), br()),
              fluidRow(
                column(width=3, 
                       img(src="PhotoIIISoybeanemergen.jpg", width='100%', height='auto'),
-                      br(),
-                      br(),
-                      img(src="PhotoI.jpg", width='100%', height='auto'),
-                      br(),
-                      br(),
+                      br(), br(),
                       div(class="panel-group", id="accordion", role="tablist", "aria-multiselectable"="true",
-                      )
                           HTML(paste0(list.of.panels[17:20], collapse="\n"))
+                      ),
+                      br(), br(),
+                      img(src="PhotoI.jpg", width='100%', height='auto'),
+                      br(), br()
                ),
                column(width=9,
                       div(class="panel-group", id="accordion", role="tablist", "aria-multiselectable"="true",
