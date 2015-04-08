@@ -77,9 +77,9 @@ fix.locations <- function(x){
   str_replace(pattern="Sutherland", replacement="Northwest Iowa") %>%
   str_replace(pattern="Kanawha", replacement="North Central Iowa") %>%
   str_replace(pattern="Nashua", replacement="Northeast Iowa") %>%
-  str_replace(pattern="Iowa west", replacement="West Central Iowa") %>%
+  str_replace(pattern="IowaWest", replacement="West Central Iowa") %>%
   str_replace(pattern="Ames", replacement="Central Iowa") %>%
-  str_replace(pattern="Iowa east", replacement="East Central Iowa") %>%
+  str_replace(pattern="IowaEast", replacement="East Central Iowa") %>%
   str_replace(pattern="Armstrong", replacement="Southwest Iowa") %>%
   str_replace(pattern="McNay", replacement="South Central Iowa") %>%
   str_replace(pattern="Crawfordsville", replacement="Southeast Iowa")
