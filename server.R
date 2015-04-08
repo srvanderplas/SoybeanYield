@@ -304,10 +304,10 @@ shinyServer(function(input, output, session) {
           if(nrow(newdata)>0){
             if(sum(is.na(plotdata$facet))>0){
               plot <- plot + 
-                geom_point(data=newdata, aes(x=jitterMG, y=nyield), size=3, alpha=.75) 
+                geom_jitter(data=newdata, aes(x=jitterMG, y=nyield), size=3, alpha=.75) 
             } else {
               plot <- plot + 
-                geom_point(data=newdata, aes(x=jitterMG, y=nyield, color=factor(facet)), size=3, alpha=.75) 
+                geom_jitter(data=newdata, aes(x=jitterMG, y=nyield, color=factor(facet)), size=3, alpha=.75) 
             }
           }
         }
@@ -442,10 +442,10 @@ shinyServer(function(input, output, session) {
           if(nrow(newdata)>0){
             if(sum(is.na(plotdata$facet))>0){
               plot <- plot + 
-                geom_point(data=newdata, aes(x=jitterDate, y=nyield), size=3, alpha=.75)
+                geom_jitter(data=newdata, aes(x=jitterDate, y=nyield), size=3, alpha=.75)
             } else {
               plot <- plot + 
-                geom_point(data=newdata, aes(x=jitterDate, y=nyield, color=factor(facet)), size=3, alpha=.75) 
+                geom_jitter(data=newdata, aes(x=jitterDate, y=nyield, color=factor(facet)), size=3, alpha=.75) 
               
             }
           }
