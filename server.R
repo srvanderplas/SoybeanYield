@@ -92,19 +92,26 @@ shinyServer(function(input, output, session) {
       }
     })
   
+  
+  # Function to draw the development timeline, with options for plot type and faceting. 
   drawDevelopmentPlot <- reactive({
+    
+    # Filter data according to user input
     longdata.sub <- filter(longyield, MG%in%input$maturity & 
                              Location%in%input$location & 
                              PlantDay%in%input$planting) 
     longdata.sub$Location <- factor(longdata.sub$Location, levels=input$location, ordered = T)
     longdata.sub$facet <- longdata.sub[,input$compare]
     
+    # Draw a "please input" plot if no rows are found, otherwise, plot data.
     if(nrow(longdata.sub)==0){
       plot <- ggplot() + 
         geom_text(aes(x=0, y=0, label="Please input\na location,\nplanting date,\n and maturity group."), size=20) +
         xlab("") + ylab("") + theme_bw() + 
         theme(axis.text=element_blank(), axis.ticks=element_blank(), title=element_blank())
     } else {
+      
+      # Fix NAs and calculate location for "Not Acheived" label
       textdata <- longdata.sub%>%group_by(Location, PlantDay, MG, Stage) %>% do(fix.na.data(.))
       textdata <- merge(textdata, longdata.sub%>%group_by(Stage)%>%summarize(y=mean(Date, na.rm=T), ymax=max(Date, na.rm=T)))
       if(sum(is.na(textdata$text))>0){
@@ -112,6 +119,7 @@ shinyServer(function(input, output, session) {
       }
       textdata$facet <- textdata[,input$compare]
       
+      # Create planting date which has year=2000
       plant.dates <- ydm(paste0("2000-", input$planting))
       second(longdata.sub$Date) <- (longdata.sub$PlantDay%in%input$planting)*(longdata.sub$Stage=="Planting")*sample(1:2, nrow(longdata.sub), replace=T)
       
