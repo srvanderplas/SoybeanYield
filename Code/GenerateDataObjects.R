@@ -107,6 +107,17 @@ longyield <- filter(longyield, Stage!="R8")
 # Remove NAs
 # longyield <- filter(longyield, !is.na(Date))
 
+# Calculate maximum times for NA "Not Acheived" 
+maxvals <- list(
+  Location = ddply(longyield, .(Location, Stage), summarize, compare="Location", ymax.backup=max(c(Date, ymd("1999-01-01")), na.rm=T)),
+  PlantDay = ddply(longyield, .(PlantDay, Stage), summarize, compare="PlantDay", ymax.backup=max(c(Date, ymd("1999-01-01")), na.rm=T)),
+  MG = ddply(longyield, .(MG, Stage), summarize, compare="MG", ymax.backup=max(c(Date, ymd("1999-01-01")), na.rm=T))
+)
+
+# Substitute November 15 for any 1999 values (placeholder for "No combination acheived maturity" at a given comparison variable level)
+maxvals <- lapply(maxvals, function(df){df$ymax.backup[df$ymax.backup==ymd("1999-01-01")] <- ymd("2000-11-15"); return(df)})
+
+save(yield, longyield, maxvals, file="Data/serverStart.rda")
 
 # Get options for ui.R
 locations <- unique(yield$Location)
