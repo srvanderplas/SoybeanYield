@@ -97,8 +97,11 @@ intro <- function(){
           HTML(paste0(list.of.panels[17:20], collapse="\n"))
         ),
         
-        br(), 
+        # Iowa Soybean Assoc. Logo
+        img(src="SoybeanAssociation.jpg", width="100%", height="auto"),
+      
         br(),
+        br(), 
         
         # Fuzzy soybean in the field
         img(src="PhotoI.jpg", width='100%', height='auto'),
