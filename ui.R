@@ -31,7 +31,7 @@ source("Code/Intro.R")
 # Function to print footer in each tab
 footer <- function(){
   img(src="Footer.jpg", width='100%', height='auto')
-}
+} # end footer function definition
 
 # Define header to be used across all tabs
 header <- function(){
@@ -51,7 +51,27 @@ header <- function(){
   
 } # end header function definition
 
+# Agronomy address
+agronomy <- function(space=T){
+  span(
+    p("Department of Agronomy,", class="nospace"),
+    p("Agronomy Hall, ", class="nospace"),
+    p("Ames, IA  50011"),
+    style=ifelse(space, "display:inline-block;margin:5%;", "display:inline-block;")
+  )
+}
 
+# copyright info
+# space parameter indicates whether there should be a bit of extra margin
+copyright <- function(space=T){
+  span(
+    p("Copyright © 2015", class="nospace"),
+    p("Iowa State University", class="nospace"),
+    p("All rights reserved."),
+    style=ifelse(space, "display:inline-block;margin:5%;", "display:inline-block;")
+  )
+} # end copyright info
+  
 # I define the intro and tool tabs in functions
 # because it's much easier to make the code modular
 # when each tab is in a separate space and clearly delineated 
@@ -79,6 +99,17 @@ intro <- function(){
       column(
         width=3, 
         
+        # Iowa Soybean Assoc. Logo
+        div(
+          img(
+            src="SoybeanAssociation.jpg", 
+            width="75%", height="auto"
+          ), style="text-align:center;"
+        ),
+        
+        br(),
+        br(),
+        
         # Cute baby soybean sprout
         img(src="PhotoIIISoybeanemergen.jpg", width='100%', height='auto'),
         
@@ -97,22 +128,17 @@ intro <- function(){
           HTML(paste0(list.of.panels[17:20], collapse="\n"))
         ),
         
-        # Iowa Soybean Assoc. Logo
-        div(
-          img(
-            src="SoybeanAssociation.jpg", 
-            width="75%", height="auto"
-          ), style="text-align:center;"
-        ),
-      
-        br(),
-        br(), 
-        
         # Fuzzy soybean in the field
         img(src="PhotoI.jpg", width='100%', height='auto'),
         
         br(), 
-        br()
+        br(),
+        
+        # Copyright info and Agronomy dept address
+        div(
+          agronomy(),
+          copyright()
+        )
         
       ), # End sidebar column
       
@@ -232,15 +258,18 @@ tool <- function(){
                
              ), # End WellPanel
              
-             br(),
-             
              wellPanel(
                
                # Iowa Soybean Assoc. Logo
-               h5("Funded by:"),
                img(src="SoybeanAssociation.jpg", width="100%", height="auto")
                
-             ) # End Logo WellPanel
+             ), # End Logo WellPanel
+             
+             wellPanel(
+               
+               # Copyright info
+               div(align="center", copyright(space=F))
+             )
              
       ) # End Development Timeline Plot Options column
       
@@ -270,11 +299,8 @@ tool <- function(){
              # Well panel because input
              wellPanel(
                
-               # Input Title
-               strong("Relative Yield by MG Plot:"),
-               
                # Radio button input$plottype2: Fitted line or box plot?
-               radioButtons("plottype2", "Type", 
+               radioButtons("plottype2", "Relative Yield by MG Plot Type: ", 
                             choices=c("Fitted Line"=2, "Box Plot" = 1), 
                             selected=2), # Default to fitted line
                
