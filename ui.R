@@ -98,7 +98,12 @@ intro <- function(){
         ),
         
         # Iowa Soybean Assoc. Logo
-        img(src="SoybeanAssociation.jpg", width="100%", height="auto"),
+        div(
+          img(
+            src="SoybeanAssociation.jpg", 
+            width="75%", height="auto"
+          ), style="text-align:center;"
+        ),
       
         br(),
         br(), 
@@ -211,7 +216,8 @@ tool <- function(){
       ), # End Development Timeline plot column
       
       # Column with input options
-      column(2, br(),
+      column(2, 
+             br(),
              wellPanel(
                # Well Panel Title
                h4("Plot Options"),
@@ -223,7 +229,19 @@ tool <- function(){
                
                # Input variable for facets on the timeline
                checkboxInput("facets", "Show sub-plots", value=FALSE)
-             )
+               
+             ), # End WellPanel
+             
+             br(),
+             
+             wellPanel(
+               
+               # Iowa Soybean Assoc. Logo
+               h5("Funded by:"),
+               img(src="SoybeanAssociation.jpg", width="100%", height="auto")
+               
+             ) # End Logo WellPanel
+             
       ) # End Development Timeline Plot Options column
       
     ), # End Development  Timeline row
