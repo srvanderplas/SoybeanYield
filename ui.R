@@ -313,52 +313,27 @@ tool <- function(){
 # Define UI
 shinyUI(
   
-  # This fluidPage allows us to set the window title
-  fluidPage(
-    list(tags$head(HTML('<link rel="icon", href="NavbarTitle.png", 
-                                   type="image/png" />'))),
-    div(style="padding: 0px 0px;margin: 0px 0px;border:0px 0px; width: '100%'",
-        titlePanel(
-          title="", windowTitle="Soybean Planting Decision Tool"
-        )
-    ),
+  # navbarPage has a bar at the top (or bottom) with links to navigate between tabs
+  navbarPage(
     
-    # navbarPage has a bar at the top (or bottom) with links to navigate between tabs
-    navbarPage(
-      
-      # Page title
-      title=
-        tagList(
-          # Necessary to align image with padding
-          tags$table( 
-            tags$tr(
-              # image, with padding
-              tags$td( 
-                img(src="NavbarTitle.png")
-              ), 
-              # title
-              tags$td("Soybean Planting Decision Tool")
-            )
-          )
-        ),
-      
-      # Use dark bar with light text
-      inverse=TRUE,
-      
-      # id (important for linking to tabs)
-      id = "tab",
-      
-      # Header
-      header = header(), 
-      
-      # Create introduction tab
-      intro(),
-      
-      # Create tool in its own tab
-      tool()
-      
-    ) # end navbarPage definition
+    # Page title
+    title="Soybean Planting Decision Tool",
     
-  ) # end fluidPage definition
+    # Use dark bar with light text
+    inverse=TRUE,
+    
+    # id (important for linking to tabs)
+    id = "tab",
+    
+    # Header
+    header = header(), 
+    
+    # Create introduction tab
+    intro(),
+    
+    # Create tool in its own tab
+    tool()
+    
+  ) # end navbarPage definition
 
 ) # end UI definition

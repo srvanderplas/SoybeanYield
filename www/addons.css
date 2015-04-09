@@ -2,7 +2,6 @@ label {
   font-size: 14px;
 }
 
-
 nav.navbar > div {
   margin-left:5%;
 }
@@ -10,19 +9,9 @@ nav.navbar > div {
 span.navbar-brand {
   font-size:24px;
   font-weight:900;
-  height:75px;
 }
 
 nav ul > li > a {
   font-size:20px;
   font-weight:bold;
-}
-
-.navbar-nav > li {
-  padding-top:15px;
-}
-
-body > div.container-fluid {
-  width:100%;
-  padding:0px;d
 }
