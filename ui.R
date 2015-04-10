@@ -135,13 +135,7 @@ intro <- function(){
         img(src="PhotoI.jpg", width='100%', height='auto'),
         
         br(), 
-        br(),
-        
-        # Copyright info and Agronomy dept address
-        div(
-          agronomy(),
-          copyright()
-        )
+        br()
         
       ), # End sidebar column
       
