@@ -46,7 +46,7 @@ header <- function(){
     
     # Bootstrap CSS for animated panels, etc. 
     # Reference: http://getbootstrap.com/css/
-    tags$link(href="bootstrap.min.css", rel="stylesheet")
+    tags$link(href="bootstrap.min.css", rel="stylesheet"),
     
     # Resizer
     tags$link(href="js/iframeResizer.contentWindow.min.js")
