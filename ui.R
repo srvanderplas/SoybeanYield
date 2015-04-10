@@ -49,7 +49,7 @@ header <- function(){
     tags$link(href="bootstrap.min.css", rel="stylesheet"),
     
     # Resizer
-    tags$link(href="js/iframeResizer.contentWindow.min.js")
+    tags$script(src="js/iframeResizer.contentWindow.min.js", type="text/javascript")
   )
   
 } # end header function definition
