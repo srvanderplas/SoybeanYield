@@ -266,13 +266,7 @@ tool <- function(){
                # Iowa Soybean Assoc. Logo
                img(src="SoybeanAssociation.jpg", width="100%", height="auto")
                
-             ), # End Logo WellPanel
-             
-             wellPanel(
-               
-               # Copyright info
-               div(align="center", copyright(space=F))
-             )
+             ) # End Logo WellPanel
              
       ) # End Development Timeline Plot Options column
       
