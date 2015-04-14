@@ -7,13 +7,13 @@ nav.navbar > div {
 }
 
 span.navbar-brand {
-  font-size:24px;
-  font-weight:900;
+  font-size:20px;
+  font-weight:normal;
 }
 
 nav ul > li > a {
-  font-size:20px;
-  font-weight:bold;
+  font-size:18px;
+  font-weight:normal;
 }
 
 .nospace {
