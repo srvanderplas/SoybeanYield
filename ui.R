@@ -42,14 +42,14 @@ header <- function(){
     # CSS for bootstrap modifications: 
     #    Change the size of the title and Tab labels, 
     #    make input labels a bit larger.
-    tags$link(href="addons.css", rel="stylesheet"),
+    singleton(tags$link(href="addons.css", rel="stylesheet")),
     
     # Bootstrap CSS for animated panels, etc. 
     # Reference: http://getbootstrap.com/css/
-    tags$link(href="bootstrap.min.css", rel="stylesheet"),
+    singleton(tags$link(href="bootstrap.min.css", rel="stylesheet")),
     
     # Resizer
-    tags$script(src="js/iframeResizer.contentWindow.min.js", type="text/javascript")
+    singleton(tags$script(src="js/iframeResizer.contentWindow.min.js", type="text/javascript"))
   )
   
 } # end header function definition
