@@ -317,7 +317,7 @@ tool <- function(){
                
                # input$newdata2 indicates whether to show data from 2014 trials.
                checkboxInput("newdata2", 
-                             "Show 2014 measured data (if available)")
+                             "Show 2014/2015 measured data (if available)")
              )
       ), # End Relative Yield plot input column
       
