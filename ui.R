@@ -355,7 +355,7 @@ shinyUI(
   navbarPage(
     
     # Page title
-    title="Soybean Planting Decision Tool",
+    title="",
     
     # Use dark bar with light text
     inverse=TRUE,
