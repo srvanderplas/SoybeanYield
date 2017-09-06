@@ -111,6 +111,17 @@ intro <- function(){
         ),
         
         br(),
+        br(),  
+        
+        # Iowa Soybean Research Logo
+        div(
+          img(
+            src="ISRCwordmark.png", 
+            width="75%", height="auto"
+          ), style="text-align:center;"
+        ),
+        
+        br(),
         br(),
         
         # Cute baby soybean sprout
