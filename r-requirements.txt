@@ -1,0 +1,10 @@
+shiny
+ggplot2
+reshape2
+plyr
+dplyr
+lubridate
+stringr
+splines
+htmltools
+magrittr
